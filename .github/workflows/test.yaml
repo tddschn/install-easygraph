@@ -25,7 +25,7 @@ jobs:
         python-version: ["3.6", "3.7", "3.8", "3.9"]
     steps:
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '{{ matrix.python-version }}'
       - name: 'Test install-easygraph - pybind11'
@@ -42,7 +42,7 @@ jobs:
         # boost-version: ["1.69.0", "1.70.0", "1.71.0", "1.72.0", "1.73.0", "1.74.0", "1.75.0", "1.76.0", "1.77.0", "1.78.0", "1.79.0"]
     steps:
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '{{ matrix.python-version }}'
       - name: 'Test install-easygraph - boost-python'
