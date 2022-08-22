@@ -1,0 +1,80 @@
+name: 'Install EasyGraph'
+description: 'Clone, build and install python-easygraph (https://github.com/easy-graph/Easy-Graph)'
+inputs:
+  cpp-binding-framework:  # id of input
+    description: "The framework used to build easygraph's C++ binding"
+    required: false
+    default: "pybind11"
+  easygraph-checkout-path:
+    default: "Easy-Graph"
+    description: 'The path to checkout the Easy-Graph repository'
+    required: false
+  boost-version:
+    default: "1.79.0"
+    description: 'The version of boost to use'
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+    - name: checkout Easy-Graph master branch
+      if: inputs.cpp-binding-framework == 'boost-python'
+      uses: actions/checkout@v3
+      with:
+        repository: easy-graph/Easy-Graph
+        path: ${{ inputs.easygraph-checkout-path }}
+        ref: 'master'
+
+    - name: checkout Easy-Graph pybind11 branch
+      if: inputs.cpp-binding-framework == 'pybind11'
+      uses: actions/checkout@v3
+      with:
+        repository: easy-graph/Easy-Graph
+        path: ${{ inputs.easygraph-checkout-path }}
+        ref: 'pybind11'
+
+    - name: install easygraph common dependencies
+      shell: bash
+      run: |          
+        pip install pytest
+        pip install Pillow
+        pip install kiwisolver
+        pip install gensim
+        pip install lxml
+
+    - name: build and install easygraph (pybind11)
+      if: inputs.cpp-binding-framework == 'pybind11'
+      shell: bash
+      working-directory: ${{ inputs.easygraph-checkout-path }}
+      run: |          
+        pip install pybind11
+        python setup.py build_ext
+        python setup.py install
+
+    - name: build and install easygraph (boost-python)
+      if: inputs.cpp-binding-framework == 'boost-python'
+      shell: bash
+      env:
+        BOOST_VERSION: ${{ inputs.boost-version }}
+      working-directory: ${{ inputs.easygraph-checkout-path }}
+      run: |          
+        PYTHON_VERSION="$(python -V | cut -d' ' -f2 | cut -d'.' -f1-2)"
+        PYTHON_VERSION_ABBR=${PYTHON_VERSION//./}
+        BOOST_VERSION_ALIAS=boost_${BOOST_VERSION//./_}
+        sudo apt-get update
+        sudo apt-get install gcc -y
+        sudo apt-get install g++ -y
+        wget https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION}/source/${BOOST_VERSION_ALIAS}.tar.gz
+        tar -xf ${BOOST_VERSION_ALIAS}.tar.gz
+        cd ${BOOST_VERSION_ALIAS}
+        ./bootstrap.sh --with-python=python
+        sudo ./b2 cxxflags="-fPIC" install --with-python
+        
+        sudo ln -s /usr/local/lib/libboost_python${PYTHON_VERSION_ABBR}.a /usr/local/lib/libboost_python.a
+
+        cd -
+
+        python setup.py build_ext -l boost_python -L "/usr/local/lib" -I "/usr/local/include"
+        python setup.py install
+      
+
