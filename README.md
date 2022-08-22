@@ -19,7 +19,7 @@
 
 ```yaml
   benchmark:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # it's only tested to work on ubuntu-latest
     steps:
       # install-easygraph will use the the version of the `python` in your path
       - name: Set up Python 3.9
