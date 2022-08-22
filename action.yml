@@ -68,10 +68,19 @@ runs:
         BOOST_VERSION: ${{ inputs.boost-version }}
       working-directory: ${{ inputs.easygraph-checkout-path }}
       run: |          
-        echo '::group::Building and installing easygraph (boost-python)'
         PYTHON_VERSION="$(python -V | cut -d' ' -f2 | cut -d'.' -f1-2)"
         PYTHON_VERSION_ABBR=${PYTHON_VERSION//./}
         BOOST_VERSION_ALIAS=boost_${BOOST_VERSION//./_}
+
+        echo '::group::Versions info'
+        echo "PYTHON_VERSION: ${PYTHON_VERSION}"
+        echo "PYTHON_VERSION_ABBR: ${PYTHON_VERSION_ABBR}"
+        echo "BOOST_VERSION: ${BOOST_VERSION}"
+        echo "BOOST_VERSION_ALIAS: ${BOOST_VERSION_ALIAS}"
+        echo '::endgroup::'
+
+        echo '::group::Building and installing easygraph (boost-python)'
+
         sudo apt-get update
         sudo apt-get install gcc -y
         sudo apt-get install g++ -y
