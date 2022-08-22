@@ -8,7 +8,7 @@
   - [What does this Action do?](#what-does-this-action-do)
   - [Usage and options](#usage-and-options)
   - [Releases](#releases)
-    - [v0.1.0](#v010)
+    - [v0.1.1](#v011)
   - [Used by](#used-by)
 
 ## What does this Action do?
@@ -36,9 +36,9 @@
 
 ## Releases
 
-### v0.1.0
+### v0.1.1
 
-The v0.1.0 release has been tested and proved to work on these configurations on ubuntu-latest:
+The v0.1.1 release has been tested and proved to work on these configurations on ubuntu-latest:
 ```
         python-version: ["3.6", "3.7", "3.8", "3.9"]
         cpp-binding-framework: ["pybind11", "boost-python"]
