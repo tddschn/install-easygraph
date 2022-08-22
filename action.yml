@@ -17,6 +17,9 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - run: |
+        echo '::group::Checking out Easy-Graph'
+      shell: bash
     - name: checkout Easy-Graph master branch
       if: inputs.cpp-binding-framework == 'boost-python'
       uses: actions/checkout@v3
@@ -32,24 +35,31 @@ runs:
         repository: easy-graph/Easy-Graph
         path: ${{ inputs.easygraph-checkout-path }}
         ref: 'pybind11'
+    - run: |
+        echo '::endgroup::'
+      shell: bash
 
     - name: install easygraph common dependencies
       shell: bash
       run: |          
+        echo '::group::Installing common dependencies'
         pip install pytest
         pip install Pillow
         pip install kiwisolver
         pip install gensim
         pip install lxml
+        echo '::endgroup::'
 
     - name: build and install easygraph (pybind11)
       if: inputs.cpp-binding-framework == 'pybind11'
       shell: bash
       working-directory: ${{ inputs.easygraph-checkout-path }}
       run: |          
+        echo '::group::Building and installing easygraph (pybind11)'
         pip install pybind11
         python setup.py build_ext
         python setup.py install
+        echo '::endgroup::'
 
     - name: build and install easygraph (boost-python)
       if: inputs.cpp-binding-framework == 'boost-python'
@@ -58,6 +68,7 @@ runs:
         BOOST_VERSION: ${{ inputs.boost-version }}
       working-directory: ${{ inputs.easygraph-checkout-path }}
       run: |          
+        echo '::group::Building and installing easygraph (boost-python)'
         PYTHON_VERSION="$(python -V | cut -d' ' -f2 | cut -d'.' -f1-2)"
         PYTHON_VERSION_ABBR=${PYTHON_VERSION//./}
         BOOST_VERSION_ALIAS=boost_${BOOST_VERSION//./_}
@@ -76,5 +87,6 @@ runs:
 
         python setup.py build_ext -l boost_python -L "/usr/local/lib" -I "/usr/local/include"
         python setup.py install
+        echo '::endgroup::'
       
 
