@@ -21,6 +21,7 @@
   benchmark:
     runs-on: ubuntu-latest
     steps:
+      # install-easygraph will use the the version of the `python` in your path
       - name: Set up Python 3.9
         uses: actions/setup-python@v2
         with:
