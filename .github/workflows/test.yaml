@@ -23,32 +23,15 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.6", "3.7", "3.8", "3.9"]
+        cpp-binding-framework: ["pybind11", "boost-python"]
     steps:
       # - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: '${{ matrix.python-version }}'
-      - name: 'Test install-easygraph - pybind11'
+      - name: 'Run install-easygraph - ${{ matrix.cpp-binding-framework }}'
         uses: tddschn/install-easygraph@master
         with:
-          cpp-binding-framework: 'pybind11'
+          cpp-binding-framework: '${{ matrix.cpp-binding-framework }}'
   
-  boost-python:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.6", "3.7", "3.8", "3.9"]
-        # boost-version: ["1.69.0", "1.70.0", "1.71.0", "1.72.0", "1.73.0", "1.74.0", "1.75.0", "1.76.0", "1.77.0", "1.78.0", "1.79.0"]
-    steps:
-      # - uses: actions/checkout@v3
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: '${{ matrix.python-version }}'
-      - name: 'Test install-easygraph - boost-python'
-        uses: tddschn/install-easygraph@master
-        with:
-          cpp-binding-framework: 'boost-python'
-          # boost-version: '{{ matrix.boost-version }}'
