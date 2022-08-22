@@ -1,5 +1,9 @@
 # install-easygraph
 
+
+[![Test the install-easygraph Action](https://github.com/tddschn/install-easygraph/actions/workflows/test.yaml/badge.svg)](https://github.com/tddschn/install-easygraph/actions/workflows/test.yaml)
+
+
 - [install-easygraph](#install-easygraph)
   - [What does this Action do?](#what-does-this-action-do)
   - [Usage and options](#usage-and-options)
