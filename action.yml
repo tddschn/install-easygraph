@@ -1,5 +1,7 @@
+# https://github.com/tddschn/install-easygraph
+# https://github.com/marketplace/actions/install-easygraph
 name: 'Install EasyGraph'
-description: 'Clone, build and install python-easygraph (https://github.com/easy-graph/Easy-Graph)'
+description: 'Action that build and install python-easygraph from source (https://github.com/easy-graph/Easy-Graph)'
 branding:
   icon: 'download-cloud'
   color: 'green'

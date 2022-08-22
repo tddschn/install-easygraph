@@ -28,7 +28,7 @@
           python-version: '3.9'
 
       - name: 'Build and install easygraph'
-        uses: tddschn/install-easygraph@master # or v0.1.0, or any other ref
+        uses: tddschn/install-easygraph@master # or v0.1.1, or any other ref
         with:
           cpp-binding-framework: pybind11 # or boost-python, defaults to pybind11
           # boost-version: '1.79.0' # optional, defaults to '1.79.0'
