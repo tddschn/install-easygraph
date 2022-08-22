@@ -29,7 +29,7 @@ jobs:
         with:
           python-version: '{{ matrix.python-version }}'
       - name: 'Test install-easygraph - pybind11'
-        uses: tddschn/install-easygraph
+        uses: tddschn/install-easygraph@master
         with:
           cpp-binding-framework: 'pybind11'
   
@@ -46,7 +46,7 @@ jobs:
         with:
           python-version: '{{ matrix.python-version }}'
       - name: 'Test install-easygraph - boost-python'
-        uses: tddschn/install-easygraph
+        uses: tddschn/install-easygraph@master
         with:
           cpp-binding-framework: 'boost-python'
           # boost-version: '{{ matrix.boost-version }}'
