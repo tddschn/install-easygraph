@@ -17,9 +17,9 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - run: |
-        echo '::group::Checking out Easy-Graph'
-      shell: bash
+    # - run: |
+    #     echo '::group::Checking out Easy-Graph'
+    #   shell: bash
     - name: checkout Easy-Graph master branch
       if: inputs.cpp-binding-framework == 'boost-python'
       uses: actions/checkout@v3
@@ -35,9 +35,9 @@ runs:
         repository: easy-graph/Easy-Graph
         path: ${{ inputs.easygraph-checkout-path }}
         ref: 'pybind11'
-    - run: |
-        echo '::endgroup::'
-      shell: bash
+    # - run: |
+    #     echo '::endgroup::'
+    #   shell: bash
 
     - name: install easygraph common dependencies
       shell: bash
