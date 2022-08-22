@@ -24,6 +24,7 @@ jobs:
       matrix:
         python-version: ["3.6", "3.7", "3.8", "3.9"]
     steps:
+      - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
@@ -41,6 +42,7 @@ jobs:
         python-version: ["3.6", "3.7", "3.8", "3.9"]
         # boost-version: ["1.69.0", "1.70.0", "1.71.0", "1.72.0", "1.73.0", "1.74.0", "1.75.0", "1.76.0", "1.77.0", "1.78.0", "1.79.0"]
     steps:
+      - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
