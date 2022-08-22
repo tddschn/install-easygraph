@@ -48,4 +48,5 @@ The release was designed to work with [easygraph](https://github.com/easy-graph/
 
 ## Used by
 
+- [easygraph](https://github.com/easy-graph/Easy-Graph)
 - [easygraph-bench](https://tddschn/easygraph-bench)
