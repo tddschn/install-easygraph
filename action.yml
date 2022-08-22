@@ -1,5 +1,8 @@
 name: 'Install EasyGraph'
 description: 'Clone, build and install python-easygraph (https://github.com/easy-graph/Easy-Graph)'
+branding:
+  icon: 'download-cloud'
+  color: 'green'
 inputs:
   cpp-binding-framework:  # id of input
     description: "The framework used to build easygraph's C++ binding"
