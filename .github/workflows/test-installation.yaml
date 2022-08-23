@@ -36,8 +36,4 @@ jobs:
           cd ..
           pwd
           tree -L 2
-          echo: '::endgroup::'
-
-          exit 0
-          
-      
+          echo '::endgroup::'
