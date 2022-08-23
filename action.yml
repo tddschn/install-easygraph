@@ -27,7 +27,8 @@ runs:
       run: |
         echo '::group::Creating temp dir'
         EG_TMP_DIR="$(mktemp --directory)"
-        echo "EG_TMP_DIR: $EG_TMP_DIR"
+        EG_TMP_DIR_RELATIVE="$(echo "${EG_TMP_DIR}" | cut -c2-)"
+        echo "EG_TMP_DIR: $EG_TMP_DIR_RELATIVE"
         echo "::set-output name=tmp-dir::$EG_TMP_DIR"
         echo 'moving temp dir under workspace'
         mkdir -p -v "$GITHUB_WORKSPACE/tmp"
