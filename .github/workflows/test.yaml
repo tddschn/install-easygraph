@@ -17,7 +17,7 @@ on:
     #     required: false
     #     type: string
 jobs:
-  pybind11:
+  test-install-easygraph:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
