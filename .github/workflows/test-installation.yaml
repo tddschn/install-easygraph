@@ -37,5 +37,7 @@ jobs:
           pwd
           tree -L 2
           echo: '::endgroup::'
+
+          exit 0
           
       
