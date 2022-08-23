@@ -1,0 +1,30 @@
+name: Test eg installation location
+on: [workflow_dispatch]
+jobs:
+  test-eg-installation-location:
+    name: Test eg installation location
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Install easygraph
+        uses: tddschn/install-easygraph@master
+      - name: get eg installed location
+        id: eg_installed_location_step
+        shell: python
+        run: |
+          from pathlib import Path
+          import easygraph as eg
+          eg_install_dir = str(Path(eg.__file__).parent)
+          print(f'::set-output name=eg_install_dir::{eg_install_dir}')
+      - name: Verify what's inside of the eg installation directory
+        shell: bash
+        # env:
+        #   EG_INSTALL_DIR: ${{ steps.eg_installed_location_step.outputs.eg_install_dir }}
+        working-directory: '${{ steps.eg_installed_location_step.outputs.eg_install_dir }}'
+        run: |
+          pwd
+          tree -L 2
+          
+      
