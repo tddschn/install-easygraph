@@ -10,10 +10,10 @@ inputs:
     description: "The framework used to build easygraph's C++ binding"
     required: false
     default: "pybind11"
-  easygraph-checkout-path:
-    default: "Easy-Graph"
-    description: 'The path to checkout the Easy-Graph repository'
-    required: false
+  # easygraph-checkout-path:
+  #   default: "Easy-Graph"
+  #   description: 'The path to checkout the Easy-Graph repository'
+  #   required: false
   boost-version:
     default: "1.79.0"
     description: 'The version of boost to use'
@@ -22,15 +22,21 @@ inputs:
 runs:
   using: "composite"
   steps:
-    # - run: |
-    #     echo '::group::Checking out Easy-Graph'
-    #   shell: bash
+    - name: Create a temporary dir for checking out
+      run: |
+        echo '::group::Creating temp dir'
+        EG_TMP_DIR="$(mktemp --directory)"
+        echo "::set-output name=tmp-dir::$EG_TMP_DIR"
+        echo '::endgroup::'
+      shell: bash
     - name: checkout Easy-Graph master branch
       if: inputs.cpp-binding-framework == 'boost-python'
       uses: actions/checkout@v3
       with:
         repository: easy-graph/Easy-Graph
-        path: ${{ inputs.easygraph-checkout-path }}
+        # path: ${{ inputs.easygraph-checkout-path }}
+        # uses tmp-dir
+        path: ${{ outputs.tmp-dir }}
         ref: 'master'
 
     - name: checkout Easy-Graph pybind11 branch
@@ -38,7 +44,8 @@ runs:
       uses: actions/checkout@v3
       with:
         repository: easy-graph/Easy-Graph
-        path: ${{ inputs.easygraph-checkout-path }}
+        # path: ${{ inputs.easygraph-checkout-path }}
+        path: ${{ outputs.tmp-dir }}
         ref: 'pybind11'
     # - run: |
     #     echo '::endgroup::'
@@ -58,7 +65,8 @@ runs:
     - name: build and install easygraph (pybind11)
       if: inputs.cpp-binding-framework == 'pybind11'
       shell: bash
-      working-directory: ${{ inputs.easygraph-checkout-path }}
+      # working-directory: ${{ inputs.easygraph-checkout-path }}
+      working-directory: '${{ outputs.tmp-dir }}'
       run: |          
         echo '::group::Building and installing easygraph (pybind11)'
         pip install pybind11
@@ -71,7 +79,8 @@ runs:
       shell: bash
       env:
         BOOST_VERSION: ${{ inputs.boost-version }}
-      working-directory: ${{ inputs.easygraph-checkout-path }}
+      # working-directory: ${{ inputs.easygraph-checkout-path }}
+      working-directory: '${{ outputs.tmp-dir }}'
       run: |          
         PYTHON_VERSION="$(python -V | cut -d' ' -f2 | cut -d'.' -f1-2)"
         PYTHON_VERSION_ABBR=${PYTHON_VERSION//./}
@@ -102,5 +111,12 @@ runs:
         python setup.py build_ext -l boost_python -L "/usr/local/lib" -I "/usr/local/include"
         python setup.py install
         echo '::endgroup::'
+    
+    - name: Remove temp dir
+      run: |
+        echo '::group::Removing temp dir'
+        rm -rfv ${{ outputs.tmp-dir }}
+        echo '::endgroup::'
+      shell: bash
       
 
