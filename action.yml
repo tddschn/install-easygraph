@@ -73,16 +73,22 @@ runs:
       shell: bash
       # working-directory: ${{ inputs.easygraph-checkout-path }}
       working-directory: '${{ steps.tempdir.outputs.tmp-dir }}'
+      id: prepping-for-building-pybind11
       run: |          
+        echo '::group::${{ jobs.test-install-easygraph.steps.prepping-for-building-pybind11.name }}'
         pip install pybind11
+        echo '::endgroup::'
 
     - name: "build easygraph's cpp binding (pybind11)"
       if: inputs.cpp-binding-framework == 'pybind11'
       shell: bash
       # working-directory: ${{ inputs.easygraph-checkout-path }}
       working-directory: '${{ steps.tempdir.outputs.tmp-dir }}'
+      id: build-pybind11
       run: |          
+        echo '::group::${{ jobs.test-install-easygraph.steps.build-pybind11.name }}'
         python setup.py build_ext
+        echo '::endgroup::'
 
     - name: "prepping for building easygraph's cpp binding (boost-python)"
       if: inputs.cpp-binding-framework == 'boost-python'
@@ -90,6 +96,7 @@ runs:
       env:
         BOOST_VERSION: ${{ inputs.boost-version }}
       working-directory: '${{ steps.tempdir.outputs.tmp-dir }}'
+      id: prepping-for-building-boost-python
       run: |          
         PYTHON_VERSION="$(python -V | cut -d' ' -f2 | cut -d'.' -f1-2)"
         PYTHON_VERSION_ABBR=${PYTHON_VERSION//./}
@@ -128,8 +135,10 @@ runs:
       env:
         BOOST_VERSION: ${{ inputs.boost-version }}
       working-directory: '${{ steps.tempdir.outputs.tmp-dir }}'
+      id: build-boost-python
       run: |          
-        echo '::group::Running build_ext'
+        # echo '::group::Running build_ext'
+        echo '::group::${{ jobs.test-install-easygraph.steps.build-boost-python.name }}'
         python setup.py build_ext -l boost_python -L "/usr/local/lib" -I "/usr/local/include"
         echo '::endgroup::'
 
