@@ -99,13 +99,18 @@ runs:
         echo "BOOST_VERSION_ALIAS: ${BOOST_VERSION_ALIAS}"
         echo '::endgroup::'
 
-        echo '::group::Building and installing easygraph (boost-python)'
-
+        echo '::group::Install build dependencies with apt-get'
         sudo apt-get update
         sudo apt-get install gcc -y
         sudo apt-get install g++ -y
+        echo '::endgroup::'
+
+        echo '::group::Downloading and extracting boost'
         wget https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION}/source/${BOOST_VERSION_ALIAS}.tar.gz
         tar -xf ${BOOST_VERSION_ALIAS}.tar.gz
+        echo '::endgroup::'
+
+        echo '::group::Building boost and boost-python'
         cd ${BOOST_VERSION_ALIAS}
         ./bootstrap.sh --with-python=python
         sudo ./b2 cxxflags="-fPIC" install --with-python
@@ -113,8 +118,13 @@ runs:
         sudo ln -s /usr/local/lib/libboost_python${PYTHON_VERSION_ABBR}.a /usr/local/lib/libboost_python.a
 
         cd -
+        echo '::endgroup::'
 
+        echo '::group::Running build_ext'
         python setup.py build_ext -l boost_python -L "/usr/local/lib" -I "/usr/local/include"
+        echo '::endgroup::'
+
+        echo '::group::Installing easygraph'
         python setup.py install
         echo '::endgroup::'
     
