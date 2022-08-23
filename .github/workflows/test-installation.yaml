@@ -17,14 +17,25 @@ jobs:
           from pathlib import Path
           import easygraph as eg
           eg_install_dir = str(Path(eg.__file__).parent)
+          eg_install_dir_parent = str(Path(eg.__file__).parent.parent)
+          print('::echo::on')
           print(f'::set-output name=eg_install_dir::{eg_install_dir}')
+          print(f'::set-output name=eg_install_dir_parent::{eg_install_dir_parent}')
       - name: Verify what's inside of the eg installation directory
         shell: bash
         # env:
         #   EG_INSTALL_DIR: ${{ steps.eg_installed_location_step.outputs.eg_install_dir }}
         working-directory: '${{ steps.eg_installed_location_step.outputs.eg_install_dir }}'
         run: |
+          echo '::group::eg'
           pwd
           tree -L 2
+          echo '::endgroup::'
+
+          echo '::group::eg_install_dir_parent'
+          cd ..
+          pwd
+          tree -L 2
+          echo: '::endgroup::'
           
       
