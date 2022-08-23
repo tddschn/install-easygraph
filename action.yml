@@ -129,12 +129,17 @@ runs:
         echo '::endgroup::'
     
     - name: Remove temp dir
+      if: ${{ always() }}
       run: |
         echo '::group::Removing temp dir'
         # using -v adds 20k lines of log
         # rm -rfv '${{ steps.tempdir.outputs.tmp-dir }}'
-        sudo rm -rf '${{ steps.tempdir.outputs.tmp-dir }}'
-        sudo rm -rf "$GITHUB_WORKSPACE/tmp"
+        if [[ -d '${{ steps.tempdir.outputs.tmp-dir }}' ]]; then
+          sudo rm -rf '${{ steps.tempdir.outputs.tmp-dir }}'
+        fi
+        if [[ -d '$GITHUB_WORKSPACE/tmp' ]]; then
+          sudo rm -rf "$GITHUB_WORKSPACE/tmp"
+        fi
         echo '::endgroup::'
       shell: bash
       
