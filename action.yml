@@ -68,24 +68,27 @@ runs:
         pip install lxml
         echo '::endgroup::'
 
-    - name: build and install easygraph (pybind11)
+    - name: "prepping for building easygraph's cpp binding (pybind11)"
       if: inputs.cpp-binding-framework == 'pybind11'
       shell: bash
       # working-directory: ${{ inputs.easygraph-checkout-path }}
       working-directory: '${{ steps.tempdir.outputs.tmp-dir }}'
       run: |          
-        echo '::group::Building and installing easygraph (pybind11)'
         pip install pybind11
-        python setup.py build_ext
-        python setup.py install
-        echo '::endgroup::'
 
-    - name: build and install easygraph (boost-python)
+    - name: "build easygraph's cpp binding (pybind11)"
+      if: inputs.cpp-binding-framework == 'pybind11'
+      shell: bash
+      # working-directory: ${{ inputs.easygraph-checkout-path }}
+      working-directory: '${{ steps.tempdir.outputs.tmp-dir }}'
+      run: |          
+        python setup.py build_ext
+
+    - name: "prepping for building easygraph's cpp binding (boost-python)"
       if: inputs.cpp-binding-framework == 'boost-python'
       shell: bash
       env:
         BOOST_VERSION: ${{ inputs.boost-version }}
-      # working-directory: ${{ inputs.easygraph-checkout-path }}
       working-directory: '${{ steps.tempdir.outputs.tmp-dir }}'
       run: |          
         PYTHON_VERSION="$(python -V | cut -d' ' -f2 | cut -d'.' -f1-2)"
@@ -117,13 +120,25 @@ runs:
         
         sudo ln -s /usr/local/lib/libboost_python${PYTHON_VERSION_ABBR}.a /usr/local/lib/libboost_python.a
 
-        cd -
         echo '::endgroup::'
 
+    - name: "build easygraph's cpp binding (boost-python)"
+      if: inputs.cpp-binding-framework == 'boost-python'
+      shell: bash
+      env:
+        BOOST_VERSION: ${{ inputs.boost-version }}
+      working-directory: '${{ steps.tempdir.outputs.tmp-dir }}'
+      run: |          
         echo '::group::Running build_ext'
         python setup.py build_ext -l boost_python -L "/usr/local/lib" -I "/usr/local/include"
         echo '::endgroup::'
 
+    - name: "install easygraph"
+      shell: bash
+      env:
+        BOOST_VERSION: ${{ inputs.boost-version }}
+      working-directory: '${{ steps.tempdir.outputs.tmp-dir }}'
+      run: |          
         echo '::group::Installing easygraph'
         python setup.py install
         echo '::endgroup::'
