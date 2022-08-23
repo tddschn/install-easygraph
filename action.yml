@@ -23,6 +23,7 @@ runs:
   using: "composite"
   steps:
     - name: Create a temporary dir for checking out
+      id: tempdir
       run: |
         echo '::group::Creating temp dir'
         EG_TMP_DIR="$(mktemp --directory)"
@@ -36,7 +37,7 @@ runs:
         repository: easy-graph/Easy-Graph
         # path: ${{ inputs.easygraph-checkout-path }}
         # uses tmp-dir
-        path: ${{ outputs.tmp-dir }}
+        path: ${{ steps.tempdir.outputs.tmp-dir }}
         ref: 'master'
 
     - name: checkout Easy-Graph pybind11 branch
@@ -45,7 +46,7 @@ runs:
       with:
         repository: easy-graph/Easy-Graph
         # path: ${{ inputs.easygraph-checkout-path }}
-        path: ${{ outputs.tmp-dir }}
+        path: ${{ steps.tempdir.outputs.tmp-dir }}
         ref: 'pybind11'
     # - run: |
     #     echo '::endgroup::'
@@ -66,7 +67,7 @@ runs:
       if: inputs.cpp-binding-framework == 'pybind11'
       shell: bash
       # working-directory: ${{ inputs.easygraph-checkout-path }}
-      working-directory: '${{ outputs.tmp-dir }}'
+      working-directory: '${{ steps.tempdir.outputs.tmp-dir }}'
       run: |          
         echo '::group::Building and installing easygraph (pybind11)'
         pip install pybind11
@@ -80,7 +81,7 @@ runs:
       env:
         BOOST_VERSION: ${{ inputs.boost-version }}
       # working-directory: ${{ inputs.easygraph-checkout-path }}
-      working-directory: '${{ outputs.tmp-dir }}'
+      working-directory: '${{ steps.tempdir.outputs.tmp-dir }}'
       run: |          
         PYTHON_VERSION="$(python -V | cut -d' ' -f2 | cut -d'.' -f1-2)"
         PYTHON_VERSION_ABBR=${PYTHON_VERSION//./}
@@ -115,7 +116,7 @@ runs:
     - name: Remove temp dir
       run: |
         echo '::group::Removing temp dir'
-        rm -rfv ${{ outputs.tmp-dir }}
+        rm -rfv '${{ steps.tempdir.outputs.tmp-dir }}'
         echo '::endgroup::'
       shell: bash
       
