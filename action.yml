@@ -127,6 +127,14 @@ runs:
         echo '::group::Installing easygraph'
         python setup.py install
         echo '::endgroup::'
+
+    - name: Test easygraph installation
+      shell: python
+      run: |          
+        print('::group::Testing easygraph installation')
+        import easygraph as eg
+        import cpp_easygraph as ceg
+        print('::endgroup::')
     
     - name: Remove temp dir
       if: ${{ always() }}
