@@ -28,16 +28,16 @@ runs:
       run: |
         cpp_binding_framework = '${{ inputs.cpp-binding-framework }}'
         if cpp_binding_framework == 'pybind11':
-          branch = 'pybind11'
-        else cpp_binding_framework == 'boost-python':
-          branch = 'master'
+            branch = 'pybind11'
+        else:
+            branch = 'master'
         print('branch: ' + branch)
         # print('::set-output name=branch::' + branch)
         # append it to $GITHUB_ENV file, using python
         import os
         github_env_file = os.environ['GITHUB_ENV']
         with open(github_env_file, 'a') as f:
-          f.write('BRANCH=' + branch.strip() + '\n')
+            f.write('BRANCH=' + branch.strip() + '\n')
     - name: Getting the SHA1 of the latest commit of the EasyGraph repository
       shell: bash
       id: 'get-sha1'
