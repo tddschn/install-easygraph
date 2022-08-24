@@ -18,6 +18,13 @@ inputs:
     default: "1.79.0"
     description: 'The version of boost to use'
     required: false
+outputs:
+  site-packages-path:
+    description: python site-packages path
+    value: '${{ steps.get-eg-install-location.outputs.site-packages-path }}'
+  eg-egg-dir-path:
+    description: easygraph egg directory path
+    value: '${{ steps.get-eg-install-location.outputs.eg-egg-dir-path }}'
 
 runs:
   using: "composite"
