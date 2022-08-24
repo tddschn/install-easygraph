@@ -42,11 +42,13 @@ runs:
       shell: bash
       id: 'get-sha1'
       run: |
+        echo '::group::Getting the SHA1 of the latest commit of the EasyGraph repository'
         echo "branch: ${{ env.BRANCH }}"
         SHA1="$(git ls-remote https://github.com/easy-graph/Easy-Graph '${{ env.BRANCH }}' | awk '{ print $1 }')"
         echo "SHA1: $SHA1"
         # echo "::set-output name=SHA1::$SHA1"
         echo "EG_SHA1=$SHA1" >> $GITHUB_ENV
+        echo '::endgroup::'
 
     - name: Create a temporary dir for checking out easygraph and tddschn/install-easygraph
       id: tempdir
@@ -165,9 +167,11 @@ runs:
       working-directory: '${{ steps.tempdir.outputs.tmp-dir }}'
       id: prepping-for-building-boost-python
       run: |          
+        echo '::group::Getting and formatting python and boost versions'
         PYTHON_VERSION="$(python -V | cut -d' ' -f2 | cut -d'.' -f1-2)"
         PYTHON_VERSION_ABBR=${PYTHON_VERSION//./}
         BOOST_VERSION_ALIAS=boost_${BOOST_VERSION//./_}
+        echo '::endgroup::'
 
         echo '::group::Versions info'
         echo "PYTHON_VERSION: ${PYTHON_VERSION}"
