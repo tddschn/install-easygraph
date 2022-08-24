@@ -244,9 +244,9 @@ runs:
             print(f'site_packages_path: {site_packages_path}')
             print(f'eg_egg_dir_path: {eg_egg_dir_path}')
             print('dir listing of site_packages_path:')
-            os.listdir(site_packages_path)
+            print(os.listdir(site_packages_path))
             print('dir listing of eg_egg_dir_path:')
-            os.listdir(eg_egg_dir_path)
+            print(os.listdir(eg_egg_dir_path))
             raise e
 
         print('::endgroup::')
