@@ -130,7 +130,7 @@ runs:
       working-directory: '${{ steps.tempdir.outputs.tmp-dir }}'
       id: prepping-for-building-pybind11
       run: |          
-        echo '::group::prepping for building easygraph\'s cpp binding (pybind11)'
+        echo '::group::prepping for building easygraph'"'"'s cpp binding (pybind11)'
         pip install pybind11
         echo '::endgroup::'
 
@@ -141,7 +141,7 @@ runs:
       working-directory: '${{ steps.tempdir.outputs.tmp-dir }}'
       id: build-pybind11
       run: |          
-        echo '::group::building easygraph\'s cpp binding (pybind11)'
+        echo '::group::building easygraph'"'"'s cpp binding (pybind11)'
         python setup.py build_ext
         echo '::endgroup::'
 
@@ -193,7 +193,7 @@ runs:
       id: build-boost-python
       run: |          
         # echo '::group::Running build_ext'
-        echo '::group::build easygraph\'s cpp binding (boost-python)'
+        echo '::group::build easygraph'"'"'s cpp binding (boost-python)'
         python setup.py build_ext -l boost_python -L "/usr/local/lib" -I "/usr/local/include"
         echo '::endgroup::'
 
