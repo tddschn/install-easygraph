@@ -89,11 +89,13 @@ runs:
         print(f'action_dir: {action_dir}')
         print(list(os.listdir(action_dir)))
         sys.path.insert(0, action_dir)
-        from utils import get_eg_egg_dir_path, set_output
+        from utils import get_eg_egg_dir_path, set_output, get_site_packages_path
         eg_egg_dir_path= get_eg_egg_dir_path('${{ env.EG_SHA1 }}')
+        set_output('site-packages-dir', get_site_packages_path())
         set_output('eg-egg-dir-path', eg_egg_dir_path)
         set_output('python-version', sys.version)
         set_output('python-version-b64', b64encode(sys.version.encode()).decode())
+        
       
     - name: Using cache on eg installation dir (egg)
       uses: actions/cache@v3
@@ -228,10 +230,25 @@ runs:
       shell: python
       run: |          
         print('::group::Testing easygraph installation')
-        import easygraph as eg
-        import cpp_easygraph as ceg
-        print(f'eg: {eg}')
-        print(f'ceg: {ceg}')
+
+        try:
+            import easygraph as eg
+            import cpp_easygraph as ceg
+            print(f'eg: {eg}')
+            print(f'ceg: {ceg}')
+        except ModuleNotFoundError as e:
+            import os
+            from pathlib import Path
+            site_packages_path = '${{ steps.get-eg-install-location.outputs.site-packages-path }}'
+            eg_egg_dir_path = '${{ steps.get-eg-install-location.outputs.eg-egg-dir-path }}'
+            print(f'site_packages_path: {site_packages_path}')
+            print(f'eg_egg_dir_path: {eg_egg_dir_path}')
+            print('dir listing of site_packages_path:')
+            os.listdir(site_packages_path)
+            print('dir listing of eg_egg_dir_path:')
+            os.listdir(eg_egg_dir_path)
+            raise e
+
         print('::endgroup::')
     
     - name: Remove temp dirs
@@ -244,4 +261,3 @@ runs:
         echo '::endgroup::'
       shell: bash
       
-

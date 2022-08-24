@@ -37,6 +37,10 @@ def get_eg_egg_dir_name(package_version: str) -> str:
     return f'{pkg_name}-{package_version}-py{python_version_str}-{platform_tag}.egg'
 
 
+def get_site_packages_path() -> str:
+    return f'/opt/hostedtoolcache/Python/{get_python_version_str(full=True)}/x64/lib/python{get_python_version_str()}/site-packages'
+
+
 def get_eg_egg_dir_path(sha1: str) -> str:
     # /opt/hostedtoolcache/Python/3.9.13/x64/lib/python3.9/site-packages/Python_EasyGraph-0.2a40-py3.9-linux-x86_64.egg
-    return f'/opt/hostedtoolcache/Python/{get_python_version_str(full=True)}/x64/lib/python{get_python_version_str()}/site-packages/{get_eg_egg_dir_name(get_eg_version(sha1))}'
+    return f'{get_site_packages_path()}/{get_eg_egg_dir_name(get_eg_version(sha1))}'
