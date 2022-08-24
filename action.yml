@@ -126,7 +126,7 @@ runs:
     #   shell: bash
 
     - name: install easygraph common dependencies
-      if: "! steps.cache.outputs.cache-hit"
+      # if: "! steps.cache.outputs.cache-hit"
       shell: bash
       run: |          
         echo '::group::Installing common dependencies'
