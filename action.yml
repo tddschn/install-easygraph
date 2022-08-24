@@ -80,8 +80,8 @@ runs:
       id: get-eg-install-location
       run: |
         import sys
-        action_tmp_dir = '${{ steps.tempdir.outputs.action-tmp-dir-absolute }}'
-        sys.path.insert(0, action_tmp_dir)
+        action_dir = '${{ github.workspace }}/${{ steps.tempdir.outputs.action-tmp-dir}}'
+        sys.path.insert(0, action_dir)
         from utils import get_eg_install_dir_path, set_output
         eg_egg_dir_path_path = get_eg_install_dir('${{ env.EG_SHA1 }}')
         set_output('eg-egg-dir-path', eg_egg_dir_path_path)
