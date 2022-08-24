@@ -82,11 +82,11 @@ runs:
         import sys
         from pathlib import Path
         # none of these works! 
-        # action_dir = '${{ github.workspace }}/${{ steps.tempdir.outputs.action-tmp-dir}}'
+        action_dir = '${{ github.workspace }}/${{ steps.tempdir.outputs.action-tmp-dir}}'
         # action_dir = '${{ env.GITHUB_WORKSPACE }}/${{ steps.tempdir.outputs.action-tmp-dir}}'
         # action_dir = f'{os.getenv("GITHUB_WORKSPACE")}/${{ steps.tempdir.outputs.action-tmp-dir}}'
-        base_dir = Path('${{ github.workspace }}').parent
-        action_dir = str(base_dir / '${{ steps.tempdir.outputs.action-tmp-dir}}')
+        # base_dir = Path('${{ github.workspace }}').parent
+        # action_dir = str(base_dir / '${{ steps.tempdir.outputs.action-tmp-dir}}')
         print(f'{base_dir=}, {action_dir=}')
         sys.path.insert(0, action_dir)
         from utils import get_eg_install_dir_path, set_output
