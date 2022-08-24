@@ -230,6 +230,8 @@ runs:
         print('::group::Testing easygraph installation')
         import easygraph as eg
         import cpp_easygraph as ceg
+        print(f'eg: {eg}')
+        print(f'ceg: {ceg}')
         print('::endgroup::')
     
     - name: Remove temp dirs
