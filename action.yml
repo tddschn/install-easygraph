@@ -91,7 +91,7 @@ runs:
         sys.path.insert(0, action_dir)
         from utils import get_eg_egg_dir_path, set_output, get_site_packages_path
         eg_egg_dir_path= get_eg_egg_dir_path('${{ env.EG_SHA1 }}')
-        set_output('site-packages-dir', get_site_packages_path())
+        set_output('site-packages-path', get_site_packages_path())
         set_output('eg-egg-dir-path', eg_egg_dir_path)
         set_output('python-version', sys.version)
         set_output('python-version-b64', b64encode(sys.version.encode()).decode())
