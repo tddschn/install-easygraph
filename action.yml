@@ -22,21 +22,75 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Create a temporary dir for checking out
+    - name: Choosing a branch based on the cpp-binding-framework input
+      shell: python
+      id: choose-branch
+      run: |
+        cpp_binding_framework = '${{ inputs.cpp-binding-framework }}'
+        if cpp_binding_framework == 'pybind11':
+          branch = 'pybind11'
+        else cpp_binding_framework == 'boost-python':
+          branch = 'master'
+        print('branch: ' + branch)
+        # print('::set-output name=branch::' + branch)
+        # append it to $GITHUB_ENV file, using python
+        import os
+        github_env_file = os.environ['GITHUB_ENV']
+        with open(github_env_file, 'a') as f:
+          f.write('BRANCH=' + branch.strip() + '\n')
+    - name: Getting the SHA1 of the latest commit of the EasyGraph repository
+      shell: bash
+      id: 'get-sha1'
+      run: |
+        echo "branch: ${{ env.BRANCH }}"
+        SHA1="$(git ls-remote https://github.com/easy-graph/Easy-Graph '${{ env.BRANCH }}' | awk '{ print $1 }')"
+        echo "SHA1: $SHA1"
+        # echo "::set-output name=SHA1::$SHA1"
+        echo "EG_SHA1=$SHA1" >> $GITHUB_ENV
+
+    - name: Create a temporary dir for checking out easygraph and tddschn/install-easygraph
       id: tempdir
       run: |
         echo '::group::Creating temp dir'
         EG_TMP_DIR="$(mktemp --directory)"
         EG_TMP_DIR_RELATIVE="$(echo "${EG_TMP_DIR}" | cut -c2-)"
+        ACTION_TMP_DIR="$(mktemp --directory)"
+        ACTION_TMP_DIR_RELATIVE="$(echo "${ACTION_TMP_DIR}" | cut -c2-)"
         echo "EG_TMP_DIR: $EG_TMP_DIR"
+        echo "ACTION_TMP_DIR: $ACTION_TMP_DIR"
         echo "::set-output name=tmp-dir::$EG_TMP_DIR_RELATIVE"
-        echo 'moving temp dir under workspace'
+        echo "::set-output name=action-tmp-dir::$ACTION_TMP_DIR_RELATIVE"
+        echo 'moving temp dirs under workspace'
         mkdir -p -v "$GITHUB_WORKSPACE/tmp"
         mv -v "$EG_TMP_DIR" "$GITHUB_WORKSPACE/tmp"
+        mv -v "$ACTION_TMP_DIR" "$GITHUB_WORKSPACE/tmp"
         echo '::endgroup::'
       shell: bash
+
+    - name: Checkout tddschn/install-easygraph
+      uses: actions/checkout@v3
+      with:
+        path: '${{ steps.tempdir.outputs.action-tmp-dir }}'
+    
+    - name: Get eg installation location
+      working-directory: '${{ steps.tempdir.outputs.action-tmp-dir }}'
+      shell: python
+      id: get-eg-install-location
+      run: |
+        from utils import get_eg_install_dir_path, set_output
+        eg_egg_dir_path_path = get_eg_install_dir('${{ env.EG_SHA1 }}')
+        set_output('eg-egg-dir-path', eg_egg_dir_path_path)
+      
+    - name: Using cache on eg installation dir (egg)
+      uses: actions/cache@v3
+      id: cache
+      with:
+        key: '${{ env.EG_SHA1 }}'
+        path: |
+          '${{ steps.get-eg-install-location.outputs.eg-egg-dir-path }}'
+
     - name: checkout Easy-Graph master branch
-      if: inputs.cpp-binding-framework == 'boost-python'
+      if: steps.cache.outputs.cache-hit && inputs.cpp-binding-framework == 'boost-python'
       uses: actions/checkout@v3
       with:
         repository: easy-graph/Easy-Graph
@@ -46,7 +100,7 @@ runs:
         ref: 'master'
 
     - name: checkout Easy-Graph pybind11 branch
-      if: inputs.cpp-binding-framework == 'pybind11'
+      if: steps.cache.outputs.cache-hit && inputs.cpp-binding-framework == 'pybind11'
       uses: actions/checkout@v3
       with:
         repository: easy-graph/Easy-Graph
@@ -58,6 +112,7 @@ runs:
     #   shell: bash
 
     - name: install easygraph common dependencies
+      if: steps.cache.outputs.cache-hit
       shell: bash
       run: |          
         echo '::group::Installing common dependencies'
@@ -69,7 +124,7 @@ runs:
         echo '::endgroup::'
 
     - name: "prepping for building easygraph's cpp binding (pybind11)"
-      if: inputs.cpp-binding-framework == 'pybind11'
+      if: steps.cache.outputs.cache-hit && inputs.cpp-binding-framework == 'pybind11'
       shell: bash
       # working-directory: ${{ inputs.easygraph-checkout-path }}
       working-directory: '${{ steps.tempdir.outputs.tmp-dir }}'
@@ -80,7 +135,7 @@ runs:
         echo '::endgroup::'
 
     - name: "build easygraph's cpp binding (pybind11)"
-      if: inputs.cpp-binding-framework == 'pybind11'
+      if: steps.cache.outputs.cache-hit && inputs.cpp-binding-framework == 'pybind11'
       shell: bash
       # working-directory: ${{ inputs.easygraph-checkout-path }}
       working-directory: '${{ steps.tempdir.outputs.tmp-dir }}'
@@ -91,7 +146,7 @@ runs:
         echo '::endgroup::'
 
     - name: "prepping for building easygraph's cpp binding (boost-python)"
-      if: inputs.cpp-binding-framework == 'boost-python'
+      if: steps.cache.outputs.cache-hit && inputs.cpp-binding-framework == 'boost-python'
       shell: bash
       env:
         BOOST_VERSION: ${{ inputs.boost-version }}
@@ -130,7 +185,7 @@ runs:
         echo '::endgroup::'
 
     - name: "build easygraph's cpp binding (boost-python)"
-      if: inputs.cpp-binding-framework == 'boost-python'
+      if: steps.cache.outputs.cache-hit && inputs.cpp-binding-framework == 'boost-python'
       shell: bash
       env:
         BOOST_VERSION: ${{ inputs.boost-version }}
@@ -143,6 +198,7 @@ runs:
         echo '::endgroup::'
 
     - name: "install easygraph"
+      if: steps.cache.outputs.cache-hit
       shell: bash
       env:
         BOOST_VERSION: ${{ inputs.boost-version }}
@@ -160,15 +216,10 @@ runs:
         import cpp_easygraph as ceg
         print('::endgroup::')
     
-    - name: Remove temp dir
+    - name: Remove temp dirs
       if: ${{ always() }}
       run: |
         echo '::group::Removing temp dir'
-        # using -v adds 20k lines of log
-        # rm -rfv '${{ steps.tempdir.outputs.tmp-dir }}'
-        if [[ -d '${{ steps.tempdir.outputs.tmp-dir }}' ]]; then
-          sudo rm -rf '${{ steps.tempdir.outputs.tmp-dir }}'
-        fi
         if [[ -d '$GITHUB_WORKSPACE/tmp' ]]; then
           sudo rm -rf "$GITHUB_WORKSPACE/tmp"
         fi
