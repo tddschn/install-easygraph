@@ -101,7 +101,7 @@ runs:
       with:
         key: 'eg-commit-sha1-${{ env.EG_SHA1 }}@python-version-b64${{ steps.get-eg-install-location.outputs.python-version-b64 }}'
         path: |
-          '${{ steps.get-eg-install-location.outputs.eg-egg-dir-path }}'
+          ${{ steps.get-eg-install-location.outputs.eg-egg-dir-path }}
 
     - name: checkout Easy-Graph master branch
       if: "! steps.cache.outputs.cache-hit && inputs.cpp-binding-framework == 'boost-python'"
