@@ -33,7 +33,8 @@ def get_eg_egg_dir_name(package_version: str) -> str:
     # Python_EasyGraph-0.2a40-py3.9-linux-x86_64.egg
     pkg_name = 'Python_EasyGraph'
     python_version_str = get_python_version_str()
-    return f'{pkg_name}-{package_version}-py{python_version_str}.egg'
+    platform_tag = 'linux-x86_64'
+    return f'{pkg_name}-{package_version}-py{python_version_str}-{platform_tag}.egg'
 
 
 def get_eg_egg_dir_path(sha1: str) -> str:
