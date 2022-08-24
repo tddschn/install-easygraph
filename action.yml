@@ -81,13 +81,8 @@ runs:
       run: |
         import sys, os
         from pathlib import Path
-        # none of these works! 
+        from base64 import b64encode
         action_dir = '${{ github.workspace }}/${{ steps.tempdir.outputs.action-tmp-dir}}'
-        # action_dir = '${{ env.GITHUB_WORKSPACE }}/${{ steps.tempdir.outputs.action-tmp-dir}}'
-        # action_dir = f'{os.getenv("GITHUB_WORKSPACE")}/${{ steps.tempdir.outputs.action-tmp-dir}}'
-        # base_dir = Path('${{ github.workspace }}').parent
-        # action_dir = str(base_dir / '${{ steps.tempdir.outputs.action-tmp-dir}}')
-        # print(f'{base_dir=}, {action_dir=}')
         # print(f'{action_dir=}') # invalid syntax before py38
         print(f'action_dir: {action_dir}')
         print(list(os.listdir(action_dir)))
@@ -96,12 +91,13 @@ runs:
         eg_egg_dir_path= get_eg_egg_dir_path('${{ env.EG_SHA1 }}')
         set_output('eg-egg-dir-path', eg_egg_dir_path)
         set_output('python-version', sys.version)
+        set_output('python-version-b64', b64encode(sys.version.encode()).decode())
       
     - name: Using cache on eg installation dir (egg)
       uses: actions/cache@v3
       id: cache
       with:
-        key: 'eg-commit-sha1-${{ env.EG_SHA1 }}@python-version-${{ steps.get-eg-install-location.outputs.python-version }}'
+        key: 'eg-commit-sha1-${{ env.EG_SHA1 }}@python-version-b64${{ steps.get-eg-install-location.outputs.python-version-b64 }}'
         path: |
           '${{ steps.get-eg-install-location.outputs.eg-egg-dir-path }}'
 
