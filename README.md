@@ -50,7 +50,7 @@ Add:
 - The `use-cached-build` option to control whether to use the cache.
 
 The caches are identified with the combination of:  
-- the easygraph commit SHA1 they were built again
+- the easygraph commit SHA1 they were built against
 - the python version (`sys.version`)
 
 The release was designed to work with [easygraph](https://github.com/easy-graph/Easy-Graph) before the `pybind11` branch is merged into master (which hasn't happened when this release was created).
