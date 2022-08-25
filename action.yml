@@ -118,7 +118,7 @@ runs:
       uses: actions/cache@v3
       id: cache
       with:
-        key: 'eg-commit-sha1-${{ env.EG_SHA1 }}@python-version-sha1${{ steps.get-eg-install-location.outputs.python-version-sha1 }}'
+        key: 'eg-commit-sha1-${{ env.EG_SHA1 }}@python-version-sha1-${{ steps.get-eg-install-location.outputs.python-version-sha1 }}'
         path: |
           ${{ steps.get-eg-install-location.outputs.site-packages-path }}/*
         # path: |
