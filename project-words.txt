@@ -2,6 +2,7 @@ easygraph
 easygraph's
 endgroup
 hostedtoolcache
+mxschmitt
 pathlib
 pybind
 tddschn

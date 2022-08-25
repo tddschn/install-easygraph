@@ -2,6 +2,12 @@ name: Test the install-easygraph Action
 on: 
   push:
   workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'     
+        required: false
+        default: false
     # inputs:
     #   cpp-binding-framework: # id of input
     #     description: "The framework used to build easygraph's C++ binding"
@@ -56,6 +62,14 @@ jobs:
           pwd
           ls -la
           echo '::endgroup::'
+      - name: Setup tmate session
+        if: "failure() && github.event_name == 'workflow_dispatch' && inputs.debug_enabled"
+        uses: mxschmitt/action-tmate@v3
+        env: 
+          SITE_PACKAGES_PATH: '${{ steps.test.outputs.site-packages-path }}'
+          EG_EGG_DIR_PATH: '${{ steps.test.outputs.eg-egg-dir-path }}'
+        with:
+          limit-access-to-actor: true
           
 
 
