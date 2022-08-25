@@ -70,3 +70,16 @@ def append_eg_egg_dir_rel_path_to_easy_install_pth(sha1: str):
     easy_install_pth_path = f'{get_site_packages_path()}/easy-install.pth'
     with open(easy_install_pth_path, 'a') as f:
         f.write(f'.{os.sep}{eg_egg_dir_name}\n')
+
+
+def sha1_str(s: str) -> str:
+    """
+    return the sha1 of the string
+    """
+    import hashlib
+
+    return hashlib.sha1(s.encode()).hexdigest()
+
+
+def get_sys_version_sha1() -> str:
+    return sha1_str(sys.version)
