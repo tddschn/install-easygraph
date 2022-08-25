@@ -41,28 +41,12 @@ jobs:
         uses: tddschn/install-easygraph@master
         with:
           cpp-binding-framework: '${{ matrix.cpp-binding-framework }}'
-      - name: Debug on failure
+      - name: Install tools for debugging on failure
         if: ${{ failure() }}
         shell: bash
-        working-directory: '${{ steps.test.outputs.eg-egg-dir-path }}'
-        env: 
-          SITE_PACKAGES_PATH: '${{ steps.test.outputs.site-packages-path }}'
-          EG_EGG_DIR_PATH: '${{ steps.test.outputs.eg-egg-dir-path }}'
         run: |
-          echo "SITE_PACKAGES_PATH: ${{ env.SITE_PACKAGES_PATH }}"
-          echo "EG_EGG_DIR_PATH: ${{ env.EG_EGG_DIR_PATH }}"
-
-          echo '::group::inside eg-egg-dir-path'
-          pwd
-          tree -L2
-          echo '::endgroup::'
-          
-          echo '::group::inside site-packages-path'
-          cd ..
-          pwd
-          ls -la
-          echo '::endgroup::'
-      - name: Setup tmate session
+          sudo apt install ranger ipython3
+      - name: Setup tmate session on failure
         if: "failure() && github.event_name == 'workflow_dispatch' && inputs.debug_enabled"
         uses: mxschmitt/action-tmate@v3
         env: 
