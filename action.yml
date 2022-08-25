@@ -33,12 +33,12 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Print action inputs
-      shell: bash
-      run: |
-        echo '::group::Action Inputs'
-        echo '${{ toJSON(inputs) }}'
-        echo '::endgroup::'
+    # - name: Print action inputs
+    #   shell: bash
+    #   run: |
+    #     echo '::group::Action Inputs'
+    #     echo '${{ toJSON(inputs) }}'
+    #     echo '::endgroup::'
         
 
     - name: Choosing a branch based on the cpp-binding-framework input
