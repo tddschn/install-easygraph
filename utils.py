@@ -23,13 +23,19 @@ def get_python_version_str(full: bool = False) -> str:
 
 
 @lru_cache()
-def get_eg_version(sha1: str) -> str:
+def get_eg_setup_py_content(sha1: str) -> str:
     setup_py_url = (
         'https://raw.githubusercontent.com/easy-graph/Easy-Graph/{}/setup.py'.format(
             sha1
         )
     )
     setup_py_content = urlopen(setup_py_url).read().decode()
+    return setup_py_content
+
+
+@lru_cache()
+def get_eg_version(sha1: str) -> str:
+    setup_py_content = get_eg_setup_py_content(sha1)
     return re.search(SETUP_PY_VERSION_PATTERN, setup_py_content, re.MULTILINE).groupdict()['version']  # type: ignore
 
 

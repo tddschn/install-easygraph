@@ -116,13 +116,16 @@ runs:
         set_output('python-version-b64', b64encode(sys.version.encode()).decode())
         
       
-    - name: Using cache on eg installation dir (egg)
+    # - name: Using cache on eg installation dir (egg)
+    - name: Using cache on site-packages/*
       uses: actions/cache@v3
       id: cache
       with:
         key: 'eg-commit-sha1-${{ env.EG_SHA1 }}@python-version-b64${{ steps.get-eg-install-location.outputs.python-version-b64 }}'
         path: |
-          ${{ steps.get-eg-install-location.outputs.eg-egg-dir-path }}
+          ${{ steps.get-eg-install-location.outputs.site-packages-path }}/*
+        # path: |
+        #   ${{ steps.get-eg-install-location.outputs.eg-egg-dir-path }}
 
     - name: Append eg egg dir to site-packages on cache hit
       if: "steps.cache.outputs.cache-hit == 'true'"
@@ -160,7 +163,7 @@ runs:
     #   shell: bash
 
     - name: install easygraph dependencies (prior to setup.py)
-      # if: "inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true'"
+      if: "inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true'"
       shell: bash
       run: |          
         echo '::group::Installing dependencies (prior to setup.py)'
@@ -172,7 +175,7 @@ runs:
         echo '::endgroup::'
 
     - name: install remaining easygraph dependencies
-      # if: "inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true'"
+      if: "inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true'"
       shell: bash
       run: |          
         echo '::group::Installing remaining dependencies'
