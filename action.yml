@@ -124,6 +124,18 @@ runs:
         path: |
           ${{ steps.get-eg-install-location.outputs.eg-egg-dir-path }}
 
+    - name: Append eg egg dir to site-packages on cache hit
+      shell: python
+      run: |
+        print('::group::Appending eg egg dir to site-packages')
+        import sys, os
+        action_dir = '${{ github.workspace }}/${{ steps.tempdir.outputs.action-tmp-dir}}'
+        sys.path.insert(0, action_dir)
+        from utils import append_eg_egg_dir_rel_path_to_easy_install_pth
+        append_eg_egg_dir_rel_path_to_easy_install_pth('${{ env.EG_SHA1 }}')
+        print('::endgroup::')
+        
+
     - name: checkout Easy-Graph master branch
       if: "inputs.use-cached-build != 'true' || ! steps.cache.outputs.cache-hit && inputs.cpp-binding-framework == 'boost-python'"
       uses: actions/checkout@v3
@@ -246,7 +258,7 @@ runs:
         echo '::endgroup::'
 
     - name: "install easygraph"
-      # if: "inputs.use-cached-build != 'true' || ! steps.cache.outputs.cache-hit"
+      if: "inputs.use-cached-build != 'true' || ! steps.cache.outputs.cache-hit"
       shell: bash
       env:
         BOOST_VERSION: ${{ inputs.boost-version }}
