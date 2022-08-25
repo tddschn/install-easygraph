@@ -118,6 +118,7 @@ runs:
       
     # - name: Using cache on eg installation dir (egg)
     - name: Using cache on site-packages/*
+      if: "inputs.use-cached-build == 'true'"
       uses: actions/cache@v3
       id: cache
       with:
@@ -128,7 +129,7 @@ runs:
         #   ${{ steps.get-eg-install-location.outputs.eg-egg-dir-path }}
 
     - name: Append eg egg dir to site-packages on cache hit
-      if: "steps.cache.outputs.cache-hit == 'true'"
+      if: "inputs.use-cached-build != 'true' && steps.cache.outputs.cache-hit == 'true'"
       shell: python
       run: |
         print('::group::Appending eg egg dir to site-packages')
@@ -141,7 +142,7 @@ runs:
         
 
     - name: checkout Easy-Graph master branch
-      if: "inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true' && inputs.cpp-binding-framework == 'boost-python'"
+      if: "(inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true') && inputs.cpp-binding-framework == 'boost-python'"
       uses: actions/checkout@v3
       with:
         repository: easy-graph/Easy-Graph
@@ -151,7 +152,7 @@ runs:
         ref: 'master'
 
     - name: checkout Easy-Graph pybind11 branch
-      if: "inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true' && inputs.cpp-binding-framework == 'pybind11'"
+      if: "(inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true') && inputs.cpp-binding-framework == 'pybind11'"
       uses: actions/checkout@v3
       with:
         repository: easy-graph/Easy-Graph
@@ -186,7 +187,7 @@ runs:
         echo '::endgroup::'
 
     - name: "prepping for building easygraph's cpp binding (pybind11)"
-      if: "inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true' && inputs.cpp-binding-framework == 'pybind11'"
+      if: "(inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true') && inputs.cpp-binding-framework == 'pybind11'"
       shell: bash
       # working-directory: ${{ inputs.easygraph-checkout-path }}
       working-directory: '${{ steps.tempdir.outputs.tmp-dir }}'
@@ -197,7 +198,7 @@ runs:
         echo '::endgroup::'
 
     - name: "build easygraph's cpp binding (pybind11)"
-      if: "inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true' && inputs.cpp-binding-framework == 'pybind11'"
+      if: "(inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true') && inputs.cpp-binding-framework == 'pybind11'"
       shell: bash
       # working-directory: ${{ inputs.easygraph-checkout-path }}
       working-directory: '${{ steps.tempdir.outputs.tmp-dir }}'
@@ -208,7 +209,7 @@ runs:
         echo '::endgroup::'
 
     - name: "prepping for building easygraph's cpp binding (boost-python)"
-      if: "inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true' && inputs.cpp-binding-framework == 'boost-python'"
+      if: "(inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true') && inputs.cpp-binding-framework == 'boost-python'"
       shell: bash
       env:
         BOOST_VERSION: ${{ inputs.boost-version }}
@@ -249,7 +250,7 @@ runs:
         echo '::endgroup::'
 
     - name: "build easygraph's cpp binding (boost-python)"
-      if: "inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true' && inputs.cpp-binding-framework == 'boost-python'"
+      if: "(inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true') && inputs.cpp-binding-framework == 'boost-python'"
       shell: bash
       env:
         BOOST_VERSION: ${{ inputs.boost-version }}
