@@ -146,16 +146,27 @@ runs:
     #     echo '::endgroup::'
     #   shell: bash
 
-    - name: install easygraph common dependencies
+    - name: install easygraph dependencies (prior to setup.py)
       # if: "inputs.use-cached-build != 'true' || ! steps.cache.outputs.cache-hit"
       shell: bash
       run: |          
-        echo '::group::Installing common dependencies'
+        echo '::group::Installing dependencies (prior to setup.py)'
         pip install pytest
         pip install Pillow
         pip install kiwisolver
         pip install gensim
-        pip install lxml
+        pip install lxml 
+        echo '::endgroup::'
+
+    - name: install remaining easygraph dependencies
+      # if: "inputs.use-cached-build != 'true' || ! steps.cache.outputs.cache-hit"
+      shell: bash
+      run: |          
+        echo '::group::Installing remaining dependencies'
+        pip install numpy pandas matplotlib statsmodels
+        pip install tqdm joblib six scikit-learn tensorflow
+        pip install scipy progressbar progressbar33
+        pip install nose
         echo '::endgroup::'
 
     - name: "prepping for building easygraph's cpp binding (pybind11)"
