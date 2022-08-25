@@ -1,5 +1,7 @@
+from functools import lru_cache
 import sys
 import re
+import os
 from urllib.request import urlopen
 from pkg_resources import safe_name, safe_version, to_filename, get_build_platform
 from sysconfig import get_paths
@@ -20,6 +22,7 @@ def get_python_version_str(full: bool = False) -> str:
     return f'{vi.major}.{vi.minor}'
 
 
+@lru_cache
 def get_eg_version(sha1: str) -> str:
     setup_py_url = (
         'https://raw.githubusercontent.com/easy-graph/Easy-Graph/{}/setup.py'.format(
@@ -54,3 +57,10 @@ def get_site_packages_path() -> str:
 def get_eg_egg_dir_path(sha1: str) -> str:
     # /opt/hostedtoolcache/Python/3.9.13/x64/lib/python3.9/site-packages/Python_EasyGraph-0.2a40-py3.9-linux-x86_64.egg
     return f'{get_site_packages_path()}/{get_eg_egg_dir_name(get_eg_version(sha1))}'
+
+
+def append_eg_egg_dir_rel_path_to_easy_install_pth(sha1: str):
+    eg_egg_dir_name = get_eg_egg_dir_name(get_eg_version(sha1))
+    easy_install_pth_path = f'{get_site_packages_path()}/easy-install.pth'
+    with open(easy_install_pth_path, 'a') as f:
+        f.write(f'.{os.sep}{eg_egg_dir_name}\n')
