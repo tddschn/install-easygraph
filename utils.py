@@ -22,7 +22,7 @@ def get_python_version_str(full: bool = False) -> str:
     return f'{vi.major}.{vi.minor}'
 
 
-@lru_cache
+@lru_cache()
 def get_eg_version(sha1: str) -> str:
     setup_py_url = (
         'https://raw.githubusercontent.com/easy-graph/Easy-Graph/{}/setup.py'.format(
