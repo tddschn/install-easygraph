@@ -30,7 +30,9 @@ jobs:
       matrix:
         python-version: ["3.6", "3.7", "3.8", "3.9"]
         cpp-binding-framework: ["pybind11", "boost-python"]
-        use-cached-build: ["true", "false"]
+        # use-cached-build: ["true", "false"]
+        include:
+          - use-cached-build: 'true'
     steps:
       # - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
