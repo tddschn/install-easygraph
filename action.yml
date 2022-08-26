@@ -95,11 +95,11 @@ runs:
         echo '::endgroup::'
       shell: bash
 
-    - name: 'Checkout ${{ github.action_repository }}'
+    - name: 'Checkout tddschn/install-easygraph'
       uses: actions/checkout@v3
       with:
         path: '${{ steps.tempdir.outputs.action-tmp-dir }}'
-        repository: '${{ github.action_repository }}'
+        repository: 'tddschn/install-easygraph'
     
     - name: Get eg installation location
       # working dir has no effect
