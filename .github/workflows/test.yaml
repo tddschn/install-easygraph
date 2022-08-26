@@ -65,46 +65,46 @@ jobs:
 
 
   
-  test-install-easygraph-conda:
-    if: false
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.6", "3.7", "3.8", "3.9"]
-        cpp-binding-framework: ["pybind11", "boost-python"]
-        # python-package-manager-install-command: ["python -m pip install", "conda install --yes"]
-        # use-cached-build: ["true", "false"]
-        include:
-          - python-package-manager-install-command: 'conda install --yes'
-          - use-cached-build: 'true'
-    steps:
-      # - uses: actions/checkout@v3
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: '${{ matrix.python-version }}'
-      - name: 'Run install-easygraph - ${{ matrix.cpp-binding-framework }}'
-        id: 'test'
-        uses: tddschn/install-easygraph@master
-        with:
-          cpp-binding-framework: '${{ matrix.cpp-binding-framework }}'
-          use-cached-build: '${{ matrix.use-cached-build }}'
-          python-package-manager-install-command: '${{ matrix.python-package-manager-install-command }}'
+  # test-install-easygraph-conda:
+  #   if: false
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       python-version: ["3.6", "3.7", "3.8", "3.9"]
+  #       cpp-binding-framework: ["pybind11", "boost-python"]
+  #       # python-package-manager-install-command: ["python -m pip install", "conda install --yes"]
+  #       # use-cached-build: ["true", "false"]
+  #       include:
+  #         - python-package-manager-install-command: 'conda install --yes'
+  #         - use-cached-build: 'true'
+  #   steps:
+  #     # - uses: actions/checkout@v3
+  #     - name: Set up Python ${{ matrix.python-version }}
+  #       uses: actions/setup-python@v4
+  #       with:
+  #         python-version: '${{ matrix.python-version }}'
+  #     - name: 'Run install-easygraph - ${{ matrix.cpp-binding-framework }}'
+  #       id: 'test'
+  #       uses: tddschn/install-easygraph@master
+  #       with:
+  #         cpp-binding-framework: '${{ matrix.cpp-binding-framework }}'
+  #         use-cached-build: '${{ matrix.use-cached-build }}'
+  #         python-package-manager-install-command: '${{ matrix.python-package-manager-install-command }}'
 
-      - name: Install tools for debugging on failure
-        if: ${{ failure() }}
-        shell: bash
-        run: |
-          sudo apt install ranger ipython3
-      - name: Setup tmate session on failure
-        if: "failure() && github.event_name == 'workflow_dispatch' && inputs.debug_enabled"
-        uses: mxschmitt/action-tmate@v3
-        env: 
-          SITE_PACKAGES_PATH: '${{ steps.test.outputs.site-packages-path }}'
-          EG_EGG_DIR_PATH: '${{ steps.test.outputs.eg-egg-dir-path }}'
-        with:
-          limit-access-to-actor: true
+  #     - name: Install tools for debugging on failure
+  #       if: ${{ failure() }}
+  #       shell: bash
+  #       run: |
+  #         sudo apt install ranger ipython3
+  #     - name: Setup tmate session on failure
+  #       if: "failure() && github.event_name == 'workflow_dispatch' && inputs.debug_enabled"
+  #       uses: mxschmitt/action-tmate@v3
+  #       env: 
+  #         SITE_PACKAGES_PATH: '${{ steps.test.outputs.site-packages-path }}'
+  #         EG_EGG_DIR_PATH: '${{ steps.test.outputs.eg-egg-dir-path }}'
+  #       with:
+  #         limit-access-to-actor: true
           
 
 
