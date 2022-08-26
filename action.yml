@@ -22,6 +22,12 @@ inputs:
     default: 'true'
     description: 'Use cached build if available'
     required: false
+  python-package-manager-install-command:
+    default: 'python -m pip install'
+    # 'conda install --yes'
+    # 'mamba install --yes'
+    description: 'The python package manager to use'
+    required: false
 outputs:
   site-packages-path:
     description: python site-packages path
@@ -89,10 +95,11 @@ runs:
         echo '::endgroup::'
       shell: bash
 
-    - name: Checkout tddschn/install-easygraph
+    - name: 'Checkout ${{ github.repository }}'
       uses: actions/checkout@v3
       with:
         path: '${{ steps.tempdir.outputs.action-tmp-dir }}'
+        repository: '${{ github.repository }}'
     
     - name: Get eg installation location
       # working dir has no effect
@@ -164,22 +171,22 @@ runs:
       shell: bash
       run: |          
         echo '::group::Installing dependencies (prior to setup.py)'
-        pip install pytest
-        pip install Pillow
-        pip install kiwisolver
-        pip install gensim
-        pip install lxml 
+        python -m pip install pytest
+        python -m pip install Pillow
+        python -m pip install kiwisolver
+        python -m pip install gensim
+        python -m pip install lxml 
         echo '::endgroup::'
 
-    - name: install remaining easygraph dependencies
+    - name: 'install remaining easygraph dependencies (${{ inputs.python-package-manager-install-command }})'
       if: "inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true'"
       shell: bash
       run: |          
         echo '::group::Installing remaining dependencies'
-        pip install numpy pandas matplotlib statsmodels
-        pip install tqdm joblib six scikit-learn tensorflow
-        pip install scipy progressbar progressbar33
-        pip install nose
+        ${{ inputs.python-package-manager-install-command }} numpy pandas matplotlib statsmodels
+        ${{ inputs.python-package-manager-install-command }} tqdm joblib six scikit-learn tensorflow
+        ${{ inputs.python-package-manager-install-command }} scipy progressbar progressbar33
+        ${{ inputs.python-package-manager-install-command }} nose
         echo '::endgroup::'
 
     - name: "prepping for building easygraph's cpp binding (pybind11)"
