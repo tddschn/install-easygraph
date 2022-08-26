@@ -8,7 +8,7 @@
   - [What does this Action do?](#what-does-this-action-do)
   - [Usage and options](#usage-and-options)
   - [Releases and changelog](#releases-and-changelog)
-    - [v0.3.0](#v030)
+    - [v0.3.1](#v031)
     - [v0.2.0](#v020)
     - [v0.1.1](#v011)
   - [Used by](#used-by)
@@ -39,8 +39,10 @@
 
 ## Releases and changelog
 
-### v0.3.0
+### v0.3.1
 
+Fix:
+- The checking out this action repository step in v0.3.0
 
 Add:
 - Caches built egg directory and dependencies under `site-packages`,  
