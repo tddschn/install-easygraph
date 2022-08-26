@@ -95,11 +95,11 @@ runs:
         echo '::endgroup::'
       shell: bash
 
-    - name: 'Checkout ${{ github.repository }}'
+    - name: 'Checkout ${{ github.action_repository }}'
       uses: actions/checkout@v3
       with:
         path: '${{ steps.tempdir.outputs.action-tmp-dir }}'
-        repository: '${{ github.repository }}'
+        repository: '${{ github.action_repository }}'
     
     - name: Get eg installation location
       # working dir has no effect
