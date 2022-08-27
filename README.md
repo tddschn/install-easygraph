@@ -19,6 +19,8 @@
 
 ## Usage and options
 
+See [`action.yml`](./action.yml)
+
 ```yaml
   benchmark:
     runs-on: ubuntu-latest # it's only tested to work on ubuntu-latest
