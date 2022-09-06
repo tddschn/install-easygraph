@@ -79,6 +79,13 @@ runs:
       id: tempdir
       run: |
         echo '::group::Creating temp dir'
+        if [[ '${{ runner.os }}' = 'macOS']]; then
+            echo '::group::macOS detected. Installing gmktemp and aliasing it.'
+            brew install coreutils
+            alias mktemp='gmktemp'
+            echo '::endgroup::'
+            
+        fi
         EG_TMP_DIR="$(mktemp --directory)"
         EG_TMP_DIR_RELATIVE="$(echo "${EG_TMP_DIR}" | cut -c2-)"
         ACTION_TMP_DIR="$(mktemp --directory)"
