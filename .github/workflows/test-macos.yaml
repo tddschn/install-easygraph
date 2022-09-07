@@ -52,7 +52,7 @@ jobs:
         if: ${{ failure() }}
         shell: bash
         run: |
-          sudo apt install ranger ipython3
+          brew install ranger ipython
       - name: Setup tmate session on failure
         if: "failure() && github.event_name == 'workflow_dispatch' && inputs.debug_enabled"
         uses: mxschmitt/action-tmate@v3
