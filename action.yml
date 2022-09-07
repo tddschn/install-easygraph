@@ -77,6 +77,8 @@ runs:
 
     - name: Create a temporary dir for checking out easygraph and tddschn/install-easygraph
       id: tempdir
+      env:
+        HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         echo '::group::Creating temp dir'
         if [[ "${{ runner.os }}" == "macOS" ]]; then

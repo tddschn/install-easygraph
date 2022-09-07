@@ -53,6 +53,8 @@ jobs:
         # if: ${{ failure() }}
         if: "'${{ steps.test.outcome }}' == 'failure'"
         shell: bash
+        env:
+          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           brew install ranger ipython
       - name: Setup tmate session on failure
@@ -61,6 +63,7 @@ jobs:
         env: 
           SITE_PACKAGES_PATH: '${{ steps.test.outputs.site-packages-path }}'
           EG_EGG_DIR_PATH: '${{ steps.test.outputs.eg-egg-dir-path }}'
+          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           limit-access-to-actor: true
           
