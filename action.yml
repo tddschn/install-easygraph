@@ -82,6 +82,10 @@ runs:
         if [[ "${{ runner.os }}" == "macOS" ]]; then
             echo '::group::macOS detected. Installing gmktemp and aliasing it.'
             brew install coreutils
+
+            # https://github.com/actions/toolkit/issues/766
+            shopt -s expand_aliases
+
             alias mktemp='gmktemp'
             echo '::endgroup::'
             

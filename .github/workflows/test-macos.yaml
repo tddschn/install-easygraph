@@ -1,4 +1,4 @@
-name: Test the install-easygraph Action
+name: Test the install-easygraph Action (macOS)
 on: 
   push:
   workflow_dispatch:
