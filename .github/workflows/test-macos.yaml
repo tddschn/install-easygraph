@@ -50,6 +50,7 @@ jobs:
         with:
           cpp-binding-framework: '${{ matrix.cpp-binding-framework }}'
           use-cached-build: '${{ matrix.use-cached-build }}'
+          install-lxml: 'false'
 
       - name: Install tools for debugging on failure
         # if: ${{ failure() }}
