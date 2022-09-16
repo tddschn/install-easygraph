@@ -2,12 +2,14 @@
 
 
 [![Test the install-easygraph Action](https://github.com/tddschn/install-easygraph/actions/workflows/test.yaml/badge.svg)](https://github.com/tddschn/install-easygraph/actions/workflows/test.yaml)
+[![Test the install-easygraph Action (macOS)](https://github.com/tddschn/install-easygraph/actions/workflows/test-macos.yaml/badge.svg)](https://github.com/tddschn/install-easygraph/actions/workflows/test-macos.yaml)
 
 
 - [install-easygraph](#install-easygraph)
   - [What does this Action do?](#what-does-this-action-do)
   - [Usage and options](#usage-and-options)
   - [Releases and changelog](#releases-and-changelog)
+    - [v0.4.0](#v040)
     - [v0.3.1](#v031)
     - [v0.2.0](#v020)
     - [v0.1.1](#v011)
@@ -36,37 +38,74 @@ See [`action.yml`](./action.yml)
         with:
           cpp-binding-framework: pybind11 # or boost-python, defaults to pybind11
           use-cached-build: 'true' # defaults to true. cached builds won't be used for anything other than 'true'.
+          install-lxml: 'false' # defaults to false. lxml is an optional dependency that doesn't provide wheel for macOS, installing it on macOS takes several minutes.
           # boost-version: '1.79.0' # optional, defaults to '1.79.0'
 ```
 
 ## Releases and changelog
 
-### v0.3.1
-
-Fix:
-- The checking out this action repository step in v0.3.0
+### v0.4.0
 
 Add:
-- Caches built egg directory and dependencies under `site-packages`,  
-  greatly speed up the action to ~23 seconds.  
-  Without caching,  
-  building with `pybind11` takes ~90 s, and building with `boost-python` takes over 3 minutes.
-- The `use-cached-build` option to control whether to use the cache.
+- macOS support when using `pybind11` as `cpp-binding-framework`.
+- The `install-lxml` option.
 
-The caches are identified with the combination of:  
-- the easygraph commit SHA1 they were built against
-- the python version (`sys.version`)
 
-The release was designed to work with [easygraph](https://github.com/easy-graph/Easy-Graph) before the `pybind11` branch is merged into master (which hasn't happened when this release was created).
 
 Tested on ubuntu-latest with the following combination of options (note that `python-version` is not an option of this action):
 
 ```yaml
-      matrix:
-        python-version: ["3.6", "3.7", "3.8", "3.9"]
+    matrix:
+    python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
+    cpp-binding-framework: ["pybind11"]
+    include:
+      - use-cached-build: 'true'
+```
+
+
+Tested on ubuntu-latest with the following combination of options (note that `python-version` is not an option of this action):
+
+```yaml
+    matrix:
+        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
         cpp-binding-framework: ["pybind11", "boost-python"]
         use-cached-build: ["true", "false"]
 ```
+
+### v0.3.1
+
+<details>
+  <summary>Click to expand</summary>
+
+  Fix:
+  - The checking out this action repository step in v0.3.0
+  
+  Add:
+  - Caches built egg directory and dependencies under `site-packages`,  
+    greatly speed up the action to ~23 seconds.  
+    Without caching,  
+    building with `pybind11` takes ~90 s, and building with `boost-python` takes over 3 minutes.
+  - The `use-cached-build` option to control whether to use the cache.
+  
+  The caches are identified with the combination of:  
+  - the easygraph commit SHA1 they were built against
+  - the python version (`sys.version`)
+  
+  The release was designed to work with [easygraph](https://github.com/easy-graph/Easy-Graph) before the `pybind11` branch is merged into master (which hasn't happened when this release was created).
+  
+  Tested on ubuntu-latest with the following combination of options (note that `python-version` is not an option of this action):
+  
+  ```yaml
+        matrix:
+          python-version: ["3.6", "3.7", "3.8", "3.9"]
+          cpp-binding-framework: ["pybind11", "boost-python"]
+          use-cached-build: ["true", "false"]
+  ```
+<!-- Two important rules:
+Make sure you have an empty line after the closing </summary> tag, otherwise the markdown/code blocks won't show correctly.
+Make sure you have an empty line after the closing </details> tag if you have multiple collapsible sections. -->
+</details>
+
 
 ### v0.2.0
 
