@@ -6,6 +6,10 @@ branding:
   icon: 'download-cloud'
   color: 'green'
 inputs:
+  install-lxml:
+    description: 'Install lxml, an optional dependency for easygraph (installation would takes longer)'
+    required: false
+    default: 'false'
   cpp-binding-framework:  # id of input
     description: "The framework used to build easygraph's C++ binding"
     required: false
@@ -192,7 +196,9 @@ runs:
         python -m pip install Pillow
         python -m pip install kiwisolver
         python -m pip install gensim
-        python -m pip install lxml 
+        if [[ "${{ inputs.install-lxml }}" == "true" ]]; then
+          python -m pip install lxml 
+        fi
         echo '::endgroup::'
 
     - name: 'install remaining easygraph dependencies (${{ inputs.python-package-manager-install-command }})'
