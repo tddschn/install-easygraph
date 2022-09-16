@@ -25,7 +25,7 @@ on:
 jobs:
   test-install-easygraph:
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.python-version }}-${{ matrix.cpp-binding-framework }}
       cancel-in-progress: true
     runs-on: ubuntu-latest
     strategy:

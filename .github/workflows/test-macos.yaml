@@ -25,7 +25,7 @@ on:
 jobs:
   test-install-easygraph:
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.python-version }}
       cancel-in-progress: true
     runs-on: macos-latest
     strategy:
@@ -63,15 +63,8 @@ jobs:
         env:
           HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo '::group::The .outcome and the step object of the test step'
-          command cat <<'EOF'
-          ${{ steps.test.outcome }}
-          ${{ steps.test }}
-          EOF
-          echo '::endgroup::'
-          
-
           brew install ranger ipython
+
       - name: Setup tmate session on failure
         # if: "'${{ steps.test.outcome }}' == 'failure' && github.event_name == 'workflow_dispatch' && inputs.debug_enabled"
         if: ${{ failure() }}
