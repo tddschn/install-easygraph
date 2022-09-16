@@ -24,6 +24,9 @@ on:
     #     type: string
 jobs:
   test-install-easygraph:
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
     runs-on: macos-latest
     strategy:
       fail-fast: false
@@ -53,8 +56,8 @@ jobs:
           install-lxml: 'false'
 
       - name: Install tools for debugging on failure
-        # if: ${{ failure() }}
-        if: "'${{ steps.test.outcome }}' == 'failure'"
+        if: ${{ failure() }}
+        # if: "'${{ steps.test.outcome }}' == 'failure'"
         continue-on-error: true
         shell: bash
         env:
@@ -70,7 +73,8 @@ jobs:
 
           brew install ranger ipython
       - name: Setup tmate session on failure
-        if: "'${{ steps.test.outcome }}' == 'failure' && github.event_name == 'workflow_dispatch' && inputs.debug_enabled"
+        # if: "'${{ steps.test.outcome }}' == 'failure' && github.event_name == 'workflow_dispatch' && inputs.debug_enabled"
+        if: ${{ failure() }}
         uses: mxschmitt/action-tmate@v3
         continue-on-error: true
         env: 
