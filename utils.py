@@ -9,11 +9,30 @@ from sysconfig import get_paths
 
 SETUP_PY_VERSION_PATTERN = r'^\s*version=([\'"])(?P<version>[\w\d\.]+)\1'
 
+def sha1_str(s: str) -> str:
+    """
+    return the sha1 of the string
+    """
+    import hashlib
+
+    return hashlib.sha1(s.encode()).hexdigest()
+
 
 def set_output(name: str, value: str):
     print(f'setting output {name} to {value}')
     github_output_file = os.environ.get('GITHUB_OUTPUT')
     assert github_output_file is not None
+    if '\n' in value:
+        # generate a random delimiter
+        delimiter = sha1_str(value)
+        # append these lines to the file
+        # {name}<<{delimiter}
+        # {value}
+        # {delimiter}
+        with open(github_output_file, 'a') as f:
+            f.write(f'{name}<<{delimiter}\n')
+            f.write(f'{value}\n')
+            f.write(f'{delimiter}\n')
     with open(github_output_file, 'a') as f:
         f.write(f'{name}={value}\n')
 
@@ -74,14 +93,6 @@ def append_eg_egg_dir_rel_path_to_easy_install_pth(sha1: str):
     with open(easy_install_pth_path, 'a') as f:
         f.write(f'.{os.sep}{eg_egg_dir_name}\n')
 
-
-def sha1_str(s: str) -> str:
-    """
-    return the sha1 of the string
-    """
-    import hashlib
-
-    return hashlib.sha1(s.encode()).hexdigest()
 
 
 def get_sys_version_sha1() -> str:
