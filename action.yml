@@ -6,22 +6,35 @@ branding:
   icon: 'download-cloud'
   color: 'green'
 inputs:
+  repository:
+    description: 'Easy-Graph repository, e.g., your fork'
+    required: false
+    default: 'easy-graph/Easy-Graph'
+  ref:
+    description: 'Branch, tag or commit to checkout for Easy-Graph'
+    required: false
+    default: 'pybind11'
+  install-pytorch:
+    description: 'Install PyTorch, an optional dependency of Easy-Graph'
+    required: false
+    default: 'true'
   install-lxml:
     description: 'Install lxml, an optional dependency for easygraph (installation would takes longer)'
     required: false
     default: 'false'
-  cpp-binding-framework:  # id of input
-    description: "The framework used to build easygraph's C++ binding"
-    required: false
-    default: "pybind11"
+  # removed because easygraph doesn't use boost-python anymore
+  # cpp-binding-framework:  # id of input
+  #   description: "The framework used to build easygraph's C++ binding"
+  #   required: false
+  #   default: "pybind11"
   # easygraph-checkout-path:
   #   default: "Easy-Graph"
   #   description: 'The path to checkout the Easy-Graph repository'
   #   required: false
-  boost-version:
-    default: "1.79.0"
-    description: 'The version of boost to use'
-    required: false
+  # boost-version:
+  #   default: "1.79.0"
+  #   description: 'The version of boost to use'
+  #   required: false
   use-cached-build:
     default: 'true'
     description: 'Use cached build if available'
@@ -55,32 +68,33 @@ runs:
     #     echo '::endgroup::'
         
 
-    - name: Choosing a branch based on the cpp-binding-framework input
-      shell: python
-      id: choose-branch
-      run: |
-        cpp_binding_framework = '${{ inputs.cpp-binding-framework }}'
-        if cpp_binding_framework == 'pybind11':
-            branch = 'pybind11'
-        else:
-            branch = 'master'
-        print('branch: ' + branch)
-        # append it to $GITHUB_ENV file, using python
-        import os
-        github_env_file = os.environ['GITHUB_ENV']
-        with open(github_env_file, 'a') as f:
-            f.write('BRANCH=' + branch.strip() + '\n')
-    - name: Getting the SHA1 of the latest commit of the EasyGraph repository
-      shell: bash
-      id: 'get-sha1'
-      run: |
-        echo '::group::Getting the SHA1 of the latest commit of the EasyGraph repository'
-        echo "branch: ${{ env.BRANCH }}"
-        SHA1="$(git ls-remote https://github.com/easy-graph/Easy-Graph '${{ env.BRANCH }}' | awk '{ print $1 }')"
-        echo "SHA1: $SHA1"
-        # echo "SHA1=$SHA1" >> $GITHUB_OUTPUT
-        echo "EG_SHA1=$SHA1" >> $GITHUB_ENV
-        echo '::endgroup::'
+    # - name: Choosing a branch based on the cpp-binding-framework input
+    #   shell: python
+    #   id: choose-branch
+    #   run: |
+    #     cpp_binding_framework = '${{ inputs.cpp-binding-framework }}'
+    #     if cpp_binding_framework == 'pybind11':
+    #         branch = 'pybind11'
+    #     else:
+    #         branch = 'master'
+    #     print('branch: ' + branch)
+    #     # append it to $GITHUB_ENV file, using python
+    #     import os
+    #     github_env_file = os.environ['GITHUB_ENV']
+    #     with open(github_env_file, 'a') as f:
+    #         f.write('BRANCH=' + branch.strip() + '\n')
+    
+    # - name: Getting the SHA1 of the latest commit of the EasyGraph repository
+    #   shell: bash
+    #   id: 'get-sha1'
+    #   run: |
+    #     echo '::group::Getting the SHA1 of the latest commit of the EasyGraph repository'
+    #     echo "branch: ${{ env.BRANCH }}"
+    #     SHA1="$(git ls-remote https://github.com/easy-graph/Easy-Graph '${{ env.BRANCH }}' | awk '{ print $1 }')"
+    #     echo "SHA1: $SHA1"
+    #     # echo "SHA1=$SHA1" >> $GITHUB_OUTPUT
+    #     echo "EG_SHA1=$SHA1" >> $GITHUB_ENV
+    #     echo '::endgroup::'
 
     - name: Create a temporary dir for checking out easygraph and tddschn/install-easygraph
       id: tempdir
@@ -132,7 +146,7 @@ runs:
         action_dir = '${{ github.workspace }}/${{ steps.tempdir.outputs.action-tmp-dir}}'
         sys.path.insert(0, action_dir)
         from utils import get_eg_egg_dir_path, set_output, get_site_packages_path, get_sys_version_sha1
-        eg_egg_dir_path= get_eg_egg_dir_path('${{ env.EG_SHA1 }}')
+        eg_egg_dir_path= get_eg_egg_dir_path('${{ inputs.repository }}', '${{ inputs.ref }}')
         set_output('site-packages-path', get_site_packages_path())
         set_output('eg-egg-dir-path', eg_egg_dir_path)
         set_output('python-version', sys.version)
@@ -145,7 +159,7 @@ runs:
       uses: actions/cache@v3
       id: cache
       with:
-        key: 'eg-commit-sha1-${{ env.EG_SHA1 }}@python-version-sha1-${{ steps.get-eg-install-location.outputs.python-version-sha1 }}'
+        key: 'eg-commit-repo-${{ inputs.repository }}-ref-${{ inputs.ref }}-@python-version-sha1-${{ steps.get-eg-install-location.outputs.python-version-sha1 }}'
         path: |
           ${{ steps.get-eg-install-location.outputs.site-packages-path }}/*
         # path: |
@@ -160,28 +174,35 @@ runs:
         action_dir = '${{ github.workspace }}/${{ steps.tempdir.outputs.action-tmp-dir}}'
         sys.path.insert(0, action_dir)
         from utils import append_eg_egg_dir_rel_path_to_easy_install_pth
-        append_eg_egg_dir_rel_path_to_easy_install_pth('${{ env.EG_SHA1 }}')
+        append_eg_egg_dir_rel_path_to_easy_install_pth('${{ inputs.repository }}', '${{ inputs.ref }}')
         print('::endgroup::')
         
 
-    - name: checkout Easy-Graph master branch
-      if: "(inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true') && inputs.cpp-binding-framework == 'boost-python'"
+    - name: checkout Easy-Graph
       uses: actions/checkout@v3
-      with:
-        repository: easy-graph/Easy-Graph
-        # path: ${{ inputs.easygraph-checkout-path }}
-        # uses tmp-dir
+      with: 
+        repository: '${{ inputs.repository }}'
+        ref: '${{ inputs.ref }}'
         path: ${{ steps.tempdir.outputs.tmp-dir }}
-        ref: 'master'
 
-    - name: checkout Easy-Graph pybind11 branch
-      if: "(inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true') && inputs.cpp-binding-framework == 'pybind11'"
-      uses: actions/checkout@v3
-      with:
-        repository: easy-graph/Easy-Graph
-        # path: ${{ inputs.easygraph-checkout-path }}
-        path: ${{ steps.tempdir.outputs.tmp-dir }}
-        ref: 'pybind11'
+    # - name: checkout Easy-Graph master branch
+    #   if: "(inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true') && inputs.cpp-binding-framework == 'boost-python'"
+    #   uses: actions/checkout@v3
+    #   with:
+    #     repository: easy-graph/Easy-Graph
+    #     # path: ${{ inputs.easygraph-checkout-path }}
+    #     # uses tmp-dir
+    #     path: ${{ steps.tempdir.outputs.tmp-dir }}
+    #     ref: 'master'
+
+    # - name: checkout Easy-Graph pybind11 branch
+    #   if: "(inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true') && inputs.cpp-binding-framework == 'pybind11'"
+    #   uses: actions/checkout@v3
+    #   with:
+    #     repository: easy-graph/Easy-Graph
+    #     # path: ${{ inputs.easygraph-checkout-path }}
+    #     path: ${{ steps.tempdir.outputs.tmp-dir }}
+    #     ref: 'pybind11'
     # - run: |
     #     echo '::endgroup::'
     #   shell: bash
@@ -198,6 +219,9 @@ runs:
         if [[ "${{ inputs.install-lxml }}" == "true" ]]; then
           python -m pip install lxml 
         fi
+        if [[ "${{ inputs.install-pytorch }}" == "true" ]]; then
+          python -m pip install torch-tensorrt -f https://github.com/pytorch/TensorRT/releases
+        fi
         echo '::endgroup::'
 
     - name: 'install remaining easygraph dependencies (${{ inputs.python-package-manager-install-command }})'
@@ -212,7 +236,7 @@ runs:
         echo '::endgroup::'
 
     - name: "prepping for building easygraph's cpp binding (pybind11)"
-      if: "(inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true') && inputs.cpp-binding-framework == 'pybind11'"
+      if: "(inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true')"
       shell: bash
       # working-directory: ${{ inputs.easygraph-checkout-path }}
       working-directory: '${{ steps.tempdir.outputs.tmp-dir }}'
@@ -223,7 +247,7 @@ runs:
         echo '::endgroup::'
 
     - name: "build easygraph's cpp binding (pybind11)"
-      if: "(inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true') && inputs.cpp-binding-framework == 'pybind11'"
+      if: "(inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true')"
       shell: bash
       # working-directory: ${{ inputs.easygraph-checkout-path }}
       working-directory: '${{ steps.tempdir.outputs.tmp-dir }}'
@@ -233,59 +257,59 @@ runs:
         python setup.py build_ext
         echo '::endgroup::'
 
-    - name: "prepping for building easygraph's cpp binding (boost-python)"
-      if: "(inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true') && inputs.cpp-binding-framework == 'boost-python'"
-      shell: bash
-      env:
-        BOOST_VERSION: ${{ inputs.boost-version }}
-      working-directory: '${{ steps.tempdir.outputs.tmp-dir }}'
-      id: prepping-for-building-boost-python
-      run: |          
-        echo '::group::Getting and formatting python and boost versions'
-        PYTHON_VERSION="$(python -V | cut -d' ' -f2 | cut -d'.' -f1-2)"
-        PYTHON_VERSION_ABBR=${PYTHON_VERSION//./}
-        BOOST_VERSION_ALIAS=boost_${BOOST_VERSION//./_}
-        echo '::endgroup::'
+    # - name: "prepping for building easygraph's cpp binding (boost-python)"
+    #   if: "(inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true') && inputs.cpp-binding-framework == 'boost-python'"
+    #   shell: bash
+    #   env:
+    #     BOOST_VERSION: ${{ inputs.boost-version }}
+    #   working-directory: '${{ steps.tempdir.outputs.tmp-dir }}'
+    #   id: prepping-for-building-boost-python
+    #   run: |          
+    #     echo '::group::Getting and formatting python and boost versions'
+    #     PYTHON_VERSION="$(python -V | cut -d' ' -f2 | cut -d'.' -f1-2)"
+    #     PYTHON_VERSION_ABBR=${PYTHON_VERSION//./}
+    #     BOOST_VERSION_ALIAS=boost_${BOOST_VERSION//./_}
+    #     echo '::endgroup::'
 
-        echo '::group::Versions info'
-        echo "PYTHON_VERSION: ${PYTHON_VERSION}"
-        echo "PYTHON_VERSION_ABBR: ${PYTHON_VERSION_ABBR}"
-        echo "BOOST_VERSION: ${BOOST_VERSION}"
-        echo "BOOST_VERSION_ALIAS: ${BOOST_VERSION_ALIAS}"
-        echo '::endgroup::'
+    #     echo '::group::Versions info'
+    #     echo "PYTHON_VERSION: ${PYTHON_VERSION}"
+    #     echo "PYTHON_VERSION_ABBR: ${PYTHON_VERSION_ABBR}"
+    #     echo "BOOST_VERSION: ${BOOST_VERSION}"
+    #     echo "BOOST_VERSION_ALIAS: ${BOOST_VERSION_ALIAS}"
+    #     echo '::endgroup::'
 
-        echo '::group::Install build dependencies with apt-get'
-        sudo apt-get update
-        sudo apt-get install gcc -y
-        sudo apt-get install g++ -y
-        echo '::endgroup::'
+    #     echo '::group::Install build dependencies with apt-get'
+    #     sudo apt-get update
+    #     sudo apt-get install gcc -y
+    #     sudo apt-get install g++ -y
+    #     echo '::endgroup::'
 
-        echo '::group::Downloading and extracting boost'
-        wget https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION}/source/${BOOST_VERSION_ALIAS}.tar.gz
-        tar -xf ${BOOST_VERSION_ALIAS}.tar.gz
-        echo '::endgroup::'
+    #     echo '::group::Downloading and extracting boost'
+    #     wget https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION}/source/${BOOST_VERSION_ALIAS}.tar.gz
+    #     tar -xf ${BOOST_VERSION_ALIAS}.tar.gz
+    #     echo '::endgroup::'
 
-        echo '::group::Building boost and boost-python'
-        cd ${BOOST_VERSION_ALIAS}
-        ./bootstrap.sh --with-python=python
-        sudo ./b2 cxxflags="-fPIC" install --with-python
+    #     echo '::group::Building boost and boost-python'
+    #     cd ${BOOST_VERSION_ALIAS}
+    #     ./bootstrap.sh --with-python=python
+    #     sudo ./b2 cxxflags="-fPIC" install --with-python
         
-        sudo ln -s /usr/local/lib/libboost_python${PYTHON_VERSION_ABBR}.a /usr/local/lib/libboost_python.a
+    #     sudo ln -s /usr/local/lib/libboost_python${PYTHON_VERSION_ABBR}.a /usr/local/lib/libboost_python.a
 
-        echo '::endgroup::'
+    #     echo '::endgroup::'
 
-    - name: "build easygraph's cpp binding (boost-python)"
-      if: "(inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true') && inputs.cpp-binding-framework == 'boost-python'"
-      shell: bash
-      env:
-        BOOST_VERSION: ${{ inputs.boost-version }}
-      working-directory: '${{ steps.tempdir.outputs.tmp-dir }}'
-      id: build-boost-python
-      run: |          
-        # echo '::group::Running build_ext'
-        echo '::group::build easygraph'"'"'s cpp binding (boost-python)'
-        python setup.py build_ext -l boost_python -L "/usr/local/lib" -I "/usr/local/include"
-        echo '::endgroup::'
+    # - name: "build easygraph's cpp binding (boost-python)"
+    #   if: "(inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true') && inputs.cpp-binding-framework == 'boost-python'"
+    #   shell: bash
+    #   env:
+    #     BOOST_VERSION: ${{ inputs.boost-version }}
+    #   working-directory: '${{ steps.tempdir.outputs.tmp-dir }}'
+    #   id: build-boost-python
+    #   run: |          
+    #     # echo '::group::Running build_ext'
+    #     echo '::group::build easygraph'"'"'s cpp binding (boost-python)'
+    #     python setup.py build_ext -l boost_python -L "/usr/local/lib" -I "/usr/local/include"
+    #     echo '::endgroup::'
 
     - name: "install easygraph"
       if: "inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true'"

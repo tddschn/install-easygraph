@@ -25,7 +25,7 @@ on:
 jobs:
   test-install-easygraph:
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.python-version }}-${{ matrix.cpp-binding-framework }}
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.python-version }}
       cancel-in-progress: true
     runs-on: ubuntu-latest
     strategy:
@@ -33,7 +33,7 @@ jobs:
       matrix:
         # python-version: ["3.6", "3.7", "3.8", "3.9"]
         python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
-        cpp-binding-framework: ["pybind11", "boost-python"]
+        # cpp-binding-framework: ["pybind11", "boost-python"]
         # python-package-manager-install-command: ["python -m pip install", "conda install --yes"]
         # use-cached-build: ["true", "false"]
         include:
@@ -48,8 +48,9 @@ jobs:
         id: 'test'
         uses: tddschn/install-easygraph@master
         with:
-          cpp-binding-framework: '${{ matrix.cpp-binding-framework }}'
+          # cpp-binding-framework: '${{ matrix.cpp-binding-framework }}'
           use-cached-build: '${{ matrix.use-cached-build }}'
+          install-pytorch: 'true'
 
       - name: Install tools for debugging on failure
         if: ${{ failure() }}

@@ -9,6 +9,7 @@ from sysconfig import get_paths
 
 SETUP_PY_VERSION_PATTERN = r'^\s*version=([\'"])(?P<version>[\w\d\.]+)\1'
 
+
 def sha1_str(s: str) -> str:
     """
     return the sha1 of the string
@@ -45,12 +46,8 @@ def get_python_version_str(full: bool = False) -> str:
 
 
 @lru_cache()
-def get_eg_setup_py_content(sha1: str) -> str:
-    setup_py_url = (
-        'https://raw.githubusercontent.com/easy-graph/Easy-Graph/{}/setup.py'.format(
-            sha1
-        )
-    )
+def get_eg_setup_py_content(repository: str, ref: str) -> str:
+    setup_py_url = f'https://raw.githubusercontent.com/{repository}/{ref}/setup.py'
     setup_py_content = urlopen(setup_py_url).read().decode()
     return setup_py_content
 
@@ -82,17 +79,16 @@ def get_site_packages_path() -> str:
     return get_paths()["purelib"]
 
 
-def get_eg_egg_dir_path(sha1: str) -> str:
+def get_eg_egg_dir_path(repository: str, ref: str) -> str:
     # /opt/hostedtoolcache/Python/3.9.13/x64/lib/python3.9/site-packages/Python_EasyGraph-0.2a40-py3.9-linux-x86_64.egg
-    return f'{get_site_packages_path()}/{get_eg_egg_dir_name(get_eg_version(sha1))}'
+    return f'{get_site_packages_path()}/{get_eg_egg_dir_name(get_eg_version(repository, ref))}'
 
 
-def append_eg_egg_dir_rel_path_to_easy_install_pth(sha1: str):
-    eg_egg_dir_name = get_eg_egg_dir_name(get_eg_version(sha1))
+def append_eg_egg_dir_rel_path_to_easy_install_pth(repository: str, ref: str):
+    eg_egg_dir_name = get_eg_egg_dir_name(get_eg_version(repository, ref))
     easy_install_pth_path = f'{get_site_packages_path()}/easy-install.pth'
     with open(easy_install_pth_path, 'a') as f:
         f.write(f'.{os.sep}{eg_egg_dir_name}\n')
-
 
 
 def get_sys_version_sha1() -> str:

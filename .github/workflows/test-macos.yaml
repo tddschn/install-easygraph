@@ -33,7 +33,7 @@ jobs:
       matrix:
         # python-version: ["3.6", "3.7", "3.8", "3.9"]
         python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
-        cpp-binding-framework: ["pybind11"]
+        # cpp-binding-framework: ["pybind11"]
         # python-package-manager-install-command: ["python -m pip install", "conda install --yes"]
         # use-cached-build: ["true", "false"]
         include:
@@ -51,7 +51,7 @@ jobs:
         env:
           HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          cpp-binding-framework: '${{ matrix.cpp-binding-framework }}'
+          # cpp-binding-framework: '${{ matrix.cpp-binding-framework }}'
           use-cached-build: '${{ matrix.use-cached-build }}'
           install-lxml: 'false'
 
