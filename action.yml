@@ -220,7 +220,7 @@ runs:
           python -m pip install lxml 
         fi
         if [[ "${{ inputs.install-pytorch }}" == "true" ]]; then
-          python -m pip install torch-tensorrt -f https://github.com/pytorch/TensorRT/releases
+          python -m pip install torch
         fi
         echo '::endgroup::'
 
