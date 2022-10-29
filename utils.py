@@ -12,7 +12,10 @@ SETUP_PY_VERSION_PATTERN = r'^\s*version=([\'"])(?P<version>[\w\d\.]+)\1'
 
 def set_output(name: str, value: str):
     print(f'setting output {name} to {value}')
-    print(f'::set-output name={name}::{value}')
+    github_output_file = os.environ.get('GITHUB_OUTPUT')
+    assert github_output_file is not None
+    with open(github_output_file, 'a') as f:
+        f.write(f'{name}={value}\n')
 
 
 def get_python_version_str(full: bool = False) -> str:

@@ -65,7 +65,6 @@ runs:
         else:
             branch = 'master'
         print('branch: ' + branch)
-        # print('::set-output name=branch::' + branch)
         # append it to $GITHUB_ENV file, using python
         import os
         github_env_file = os.environ['GITHUB_ENV']
@@ -79,7 +78,7 @@ runs:
         echo "branch: ${{ env.BRANCH }}"
         SHA1="$(git ls-remote https://github.com/easy-graph/Easy-Graph '${{ env.BRANCH }}' | awk '{ print $1 }')"
         echo "SHA1: $SHA1"
-        # echo "::set-output name=SHA1::$SHA1"
+        # echo "SHA1=$SHA1" >> $GITHUB_OUTPUT
         echo "EG_SHA1=$SHA1" >> $GITHUB_ENV
         echo '::endgroup::'
 
@@ -106,9 +105,9 @@ runs:
         ACTION_TMP_DIR_RELATIVE="$(echo "${ACTION_TMP_DIR}" | cut -c2-)"
         echo "EG_TMP_DIR: $EG_TMP_DIR"
         echo "ACTION_TMP_DIR: $ACTION_TMP_DIR"
-        echo "::set-output name=tmp-dir::$EG_TMP_DIR_RELATIVE"
-        echo "::set-output name=action-tmp-dir::$ACTION_TMP_DIR_RELATIVE"
-        echo "::set-output name=action-tmp-dir-absolute::$ACTION_TMP_DIR"
+        echo "tmp-dir=$EG_TMP_DIR_RELATIVE" >> $GITHUB_OUTPUT
+        echo "action-tmp-dir=$ACTION_TMP_DIR_RELATIVE" >> $GITHUB_OUTPUT
+        echo "action-tmp-dir-absolute=$ACTION_TMP_DIR" >> $GITHUB_OUTPUT
         echo 'moving temp dirs under workspace'
         mkdir -p -v "$GITHUB_WORKSPACE/tmp"
         mv -v "$EG_TMP_DIR" "$GITHUB_WORKSPACE/tmp"
