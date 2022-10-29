@@ -53,8 +53,8 @@ def get_eg_setup_py_content(repository: str, ref: str) -> str:
 
 
 @lru_cache()
-def get_eg_version(sha1: str) -> str:
-    setup_py_content = get_eg_setup_py_content(sha1)
+def get_eg_version(repository: str, ref: str) -> str:
+    setup_py_content = get_eg_setup_py_content(repository, ref)
     return re.search(SETUP_PY_VERSION_PATTERN, setup_py_content, re.MULTILINE).groupdict()['version']  # type: ignore
 
 
