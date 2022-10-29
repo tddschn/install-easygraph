@@ -9,6 +9,7 @@
   - [What does this Action do?](#what-does-this-action-do)
   - [Usage and options](#usage-and-options)
   - [Releases and changelog](#releases-and-changelog)
+    - [v0.5.0](#v050)
     - [v0.4.0](#v040)
     - [v0.3.1](#v031)
     - [v0.2.0](#v020)
@@ -36,13 +37,27 @@ See [`action.yml`](./action.yml)
       - name: 'Build and install easygraph'
         uses: tddschn/install-easygraph@master # or v0.1.1, or any other ref
         with:
-          cpp-binding-framework: pybind11 # or boost-python, defaults to pybind11
+          repository: 'easy-graph/Easy-Graph' # or tddschn/Easy-Graph
+          ref: 'pybind11' # SHA1, tag, or branch
           use-cached-build: 'true' # defaults to true. cached builds won't be used for anything other than 'true'.
           install-lxml: 'false' # defaults to false. lxml is an optional dependency that doesn't provide wheel for macOS, installing it on macOS takes several minutes.
-          # boost-version: '1.79.0' # optional, defaults to '1.79.0'
+          install-pytorch: 'false' # whether to install pytorch
 ```
 
 ## Releases and changelog
+
+### v0.5.0
+
+Deprecates:
+- Building C++ extension with `boost-python`.
+
+Add:
+- The `install-pytorch`, `repository`, and `ref` options.
+- `install-pytorch` controls whether to install `pytorch` in the installation process
+- `repository` and `ref` allow users to select other repository (e.g. a fork) and ref other than the tip of the `master` or `pybind11` branch.
+  
+Remove:
+- The `cpp-binding-framework`, `boost-version` options.
 
 ### v0.4.0
 
