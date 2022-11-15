@@ -22,8 +22,6 @@ jobs:
         # cpp-binding-framework: ["pybind11", "boost-python"]
         # python-package-manager-install-command: ["python -m pip install", "conda install --yes"]
         # use-cached-build: ["true", "false"]
-        include:
-          - use-cached-build: 'true'
     steps:
       # - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
@@ -34,7 +32,6 @@ jobs:
         id: 'test'
         uses: tddschn/install-easygraph/dummy@master
         with:
-          use-cached-build: '${{ matrix.use-cached-build }}'
           install-pytorch: 'true'
 
       - name: Install tools for debugging on failure
@@ -45,9 +42,6 @@ jobs:
       - name: Setup tmate session on failure
         if: "failure() && github.event_name == 'workflow_dispatch' && inputs.debug_enabled"
         uses: mxschmitt/action-tmate@v3
-        env: 
-          SITE_PACKAGES_PATH: '${{ steps.test.outputs.site-packages-path }}'
-          EG_EGG_DIR_PATH: '${{ steps.test.outputs.eg-egg-dir-path }}'
         with:
           limit-access-to-actor: true
           
