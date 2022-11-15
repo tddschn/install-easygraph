@@ -1,0 +1,56 @@
+name: Test the install-easygraph Action (Ubuntu) (dummy)
+on: 
+  push:
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'     
+        required: false
+        default: false
+jobs:
+  test-install-easygraph:
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.python-version }}
+      cancel-in-progress: true
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # python-version: ["3.6", "3.7", "3.8", "3.9"]
+        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
+        # cpp-binding-framework: ["pybind11", "boost-python"]
+        # python-package-manager-install-command: ["python -m pip install", "conda install --yes"]
+        # use-cached-build: ["true", "false"]
+        include:
+          - use-cached-build: 'true'
+    steps:
+      # - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: '${{ matrix.python-version }}'
+      - name: 'Run install-easygraph (dummy) - ${{ matrix.cpp-binding-framework }}'
+        id: 'test'
+        uses: tddschn/install-easygraph/dummy@master
+        with:
+          use-cached-build: '${{ matrix.use-cached-build }}'
+          install-pytorch: 'true'
+
+      - name: Install tools for debugging on failure
+        if: ${{ failure() }}
+        shell: bash
+        run: |
+          sudo apt install ranger ipython3
+      - name: Setup tmate session on failure
+        if: "failure() && github.event_name == 'workflow_dispatch' && inputs.debug_enabled"
+        uses: mxschmitt/action-tmate@v3
+        env: 
+          SITE_PACKAGES_PATH: '${{ steps.test.outputs.site-packages-path }}'
+          EG_EGG_DIR_PATH: '${{ steps.test.outputs.eg-egg-dir-path }}'
+        with:
+          limit-access-to-actor: true
+          
+
+
+  

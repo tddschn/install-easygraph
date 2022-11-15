@@ -1,0 +1,157 @@
+# https://github.com/tddschn/install-easygraph
+# https://github.com/marketplace/actions/install-easygraph
+name: 'Install EasyGraph dummy version with complicated caching logic removed'
+description: 'Action that build and install python-easygraph from source (https://github.com/easy-graph/Easy-Graph)'
+branding:
+  icon: 'download-cloud'
+  color: 'green'
+inputs:
+  repository:
+    description: 'Easy-Graph repository, e.g., your fork'
+    required: false
+    default: 'easy-graph/Easy-Graph'
+  ref:
+    description: 'Branch, tag or commit to checkout for Easy-Graph'
+    required: false
+    default: 'pybind11'
+  install-pytorch:
+    description: 'Install PyTorch, an optional dependency of Easy-Graph'
+    required: false
+    default: 'true'
+  install-lxml:
+    description: 'Install lxml, an optional dependency for easygraph (installation would takes longer)'
+    required: false
+    default: 'false'
+  python-package-manager-install-command:
+    default: 'python -m pip install'
+    # 'conda install --yes'
+    # 'mamba install --yes'
+    description: 'The python package manager to use'
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+    - name: Create a temporary dir for checking out easygraph and tddschn/install-easygraph
+      id: tempdir
+      # env:
+      #   HOMEBREW_GITHUB_API_TOKEN: ${{ inputs.GITHUB_TOKEN }}
+      run: |
+        echo '::group::Creating temp dir'
+        if [[ "${{ runner.os }}" == "macOS" ]]; then
+            echo '::group::macOS detected. Installing gmktemp and aliasing it.'
+            brew install coreutils
+
+            # https://github.com/actions/toolkit/issues/766
+            shopt -s expand_aliases
+
+            alias mktemp='gmktemp'
+            echo '::endgroup::'
+            
+        fi
+        EG_TMP_DIR="$(mktemp --directory)"
+        EG_TMP_DIR_RELATIVE="$(echo "${EG_TMP_DIR}" | cut -c2-)"
+        ACTION_TMP_DIR="$(mktemp --directory)"
+        ACTION_TMP_DIR_RELATIVE="$(echo "${ACTION_TMP_DIR}" | cut -c2-)"
+        echo "EG_TMP_DIR: $EG_TMP_DIR"
+        echo "ACTION_TMP_DIR: $ACTION_TMP_DIR"
+        echo "tmp-dir=$EG_TMP_DIR_RELATIVE" >> $GITHUB_OUTPUT
+        echo "action-tmp-dir=$ACTION_TMP_DIR_RELATIVE" >> $GITHUB_OUTPUT
+        echo "action-tmp-dir-absolute=$ACTION_TMP_DIR" >> $GITHUB_OUTPUT
+        echo 'moving temp dirs under workspace'
+        mkdir -p -v "$GITHUB_WORKSPACE/tmp"
+        mv -v "$EG_TMP_DIR" "$GITHUB_WORKSPACE/tmp"
+        mv -v "$ACTION_TMP_DIR" "$GITHUB_WORKSPACE/tmp"
+        echo '::endgroup::'
+      shell: bash
+    - name: checkout Easy-Graph
+      uses: actions/checkout@v3
+      with: 
+        repository: '${{ inputs.repository }}'
+        ref: '${{ inputs.ref }}'
+        path: ${{ steps.tempdir.outputs.tmp-dir }}
+    - name: install easygraph dependencies (prior to setup.py)
+      if: "inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true'"
+      shell: bash
+      run: |          
+        echo '::group::Installing dependencies (prior to setup.py)'
+        python -m pip install pytest
+        python -m pip install Pillow
+        python -m pip install kiwisolver
+        python -m pip install gensim
+        if [[ "${{ inputs.install-lxml }}" == "true" ]]; then
+          python -m pip install lxml 
+        fi
+        if [[ "${{ inputs.install-pytorch }}" == "true" ]]; then
+          python -m pip install torch
+        fi
+        echo '::endgroup::'
+
+    - name: 'install remaining easygraph dependencies (${{ inputs.python-package-manager-install-command }})'
+      if: "inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true'"
+      shell: bash
+      run: |          
+        echo '::group::Installing remaining dependencies'
+        ${{ inputs.python-package-manager-install-command }} numpy pandas matplotlib statsmodels
+        ${{ inputs.python-package-manager-install-command }} tqdm joblib six scikit-learn tensorflow
+        ${{ inputs.python-package-manager-install-command }} scipy progressbar progressbar33
+        ${{ inputs.python-package-manager-install-command }} nose
+        echo '::endgroup::'
+
+    - name: "prepping for building easygraph's cpp binding (pybind11)"
+      if: "(inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true')"
+      shell: bash
+      # working-directory: ${{ inputs.easygraph-checkout-path }}
+      working-directory: '${{ steps.tempdir.outputs.tmp-dir }}'
+      id: prepping-for-building-pybind11
+      run: |          
+        echo '::group::prepping for building easygraph'"'"'s cpp binding (pybind11)'
+        pip install pybind11
+        echo '::endgroup::'
+
+    - name: "build easygraph's cpp binding (pybind11)"
+      if: "(inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true')"
+      shell: bash
+      # working-directory: ${{ inputs.easygraph-checkout-path }}
+      working-directory: '${{ steps.tempdir.outputs.tmp-dir }}'
+      id: build-pybind11
+      run: |          
+        echo '::group::building easygraph'"'"'s cpp binding (pybind11)'
+        python setup.py build_ext
+        echo '::endgroup::'
+    - name: "install easygraph"
+      if: "inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true'"
+      shell: bash
+      env:
+        BOOST_VERSION: ${{ inputs.boost-version }}
+      working-directory: '${{ steps.tempdir.outputs.tmp-dir }}'
+      run: |          
+        echo '::group::Installing easygraph'
+        python setup.py install
+        echo '::endgroup::'
+
+    - name: Test easygraph installation
+      shell: python
+      run: |          
+        print('::group::Testing easygraph installation')
+
+        try:
+            import easygraph as eg
+            import cpp_easygraph as ceg
+            print(f'eg: {eg}')
+            print(f'ceg: {ceg}')
+        except ModuleNotFoundError as e:
+            raise e
+
+        print('::endgroup::')
+    
+    - name: Remove temp dirs
+      if: ${{ always() }}
+      run: |
+        echo '::group::Removing temp dir'
+        if [[ -d '$GITHUB_WORKSPACE/tmp' ]]; then
+          sudo rm -rf "$GITHUB_WORKSPACE/tmp"
+        fi
+        echo '::endgroup::'
+      shell: bash
+      

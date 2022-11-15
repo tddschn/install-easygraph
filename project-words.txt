@@ -1,8 +1,11 @@
+conda
+coreutils
 cxxflags
 easygraph
 easygraph's
 endgroup
 gensim
+gmktemp
 hostedtoolcache
 ipython
 joblib
@@ -23,6 +26,7 @@ pytest
 pyver
 scikit
 scipy
+shopt
 statsmodels
 tddschn
 tempdir
