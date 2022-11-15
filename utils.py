@@ -16,7 +16,10 @@ def sha1_str(s: str) -> str:
     """
     import hashlib
 
-    return hashlib.sha1(s.encode()).hexdigest()
+    h = hashlib.sha1()
+    h.update(s.encode())
+    return h.hexdigest()
+    # return hashlib.sha1(s.encode()).hexdigest()
 
 
 def set_output(name: str, value: str):
