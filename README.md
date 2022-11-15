@@ -8,6 +8,8 @@
 - [install-easygraph](#install-easygraph)
   - [What does this Action do?](#what-does-this-action-do)
   - [Usage and options](#usage-and-options)
+    - [`tddschn/install-easygraph`](#tddschninstall-easygraph)
+    - [`tddschn/install-easygraph/dummy`](#tddschninstall-easygraphdummy)
   - [Releases and changelog](#releases-and-changelog)
     - [v0.5.0](#v050)
     - [v0.4.0](#v040)
@@ -21,6 +23,8 @@
 `tddschn/install-easygraph` is a Action that builds and installs the [easygraph](https://github.com/easy-graph/Easy-Graph) from source, on ubuntu-latest.
 
 ## Usage and options
+
+### `tddschn/install-easygraph`
 
 See [`action.yml`](./action.yml)
 
@@ -44,9 +48,40 @@ See [`action.yml`](./action.yml)
           install-pytorch: 'false' # whether to install pytorch
 ```
 
+### `tddschn/install-easygraph/dummy`
+
+With complicated caching logic removed.
+
+See [`dummy/action.yml`](./dummy/action.yml)
+
+```yaml
+  benchmark:
+    runs-on: ubuntu-latest # it's only tested to work on ubuntu-latest
+    steps:
+      # install-easygraph will use the the version of the `python` in your path
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: 'Build and install easygraph'
+        uses: tddschn/install-easygraph@master # or v0.1.1, or any other ref
+        with:
+        repository: 'easy-graph/Easy-Graph' # or tddschn/Easy-Graph
+          ref: 'pybind11' # SHA1, tag, or branch
+          install-lxml: 'false' # defaults to false. lxml is an optional dependency that doesn't provide wheel for macOS, installing it on macOS takes several minutes.
+          install-pytorch: 'false' # whether to install pytorch
+```
+
 ## Releases and changelog
 
 ### v0.5.0
+
+**Warning**:  
+`tddschn/install-easygraph@v0.5.0` only works for python>=3.10 on Ubuntu, I'm still investigating the issue.
+
+For use with python <= 3.9, use `tddschn/install-easygraph/dummy@v0.5.0`  
+which removed complicated caching logic.
 
 Deprecates:
 - Building C++ extension with `boost-python`.
@@ -55,6 +90,8 @@ Add:
 - The `install-pytorch`, `repository`, and `ref` options.
 - `install-pytorch` controls whether to install `pytorch` in the installation process
 - `repository` and `ref` allow users to select other repository (e.g. a fork) and ref other than the tip of the `master` or `pybind11` branch.
+- A new dummy workflow without caching logic:  
+  `tddschn/install-easygraph/dummy`
   
 Remove:
 - The `cpp-binding-framework`, `boost-version` options.
