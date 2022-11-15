@@ -1,4 +1,4 @@
-name: Test the install-easygraph Action (Ubuntu) (dummy)
+name: Test the install-easygraph Action (macOS) (dummy)
 on: 
   push:
   workflow_dispatch:
@@ -13,36 +13,43 @@ jobs:
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.python-version }}
       cancel-in-progress: true
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     strategy:
       fail-fast: false
       matrix:
-        # python-version: ["3.6", "3.7", "3.8", "3.9"]
         python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
-        # cpp-binding-framework: ["pybind11", "boost-python"]
-        # python-package-manager-install-command: ["python -m pip install", "conda install --yes"]
-        # use-cached-build: ["true", "false"]
     steps:
-      # - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: '${{ matrix.python-version }}'
-      - name: 'Run install-easygraph (dummy) - ${{ matrix.cpp-binding-framework }}'
+      - name: 'Run install-easygraph - ${{ matrix.cpp-binding-framework }}'
         id: 'test'
+        continue-on-error: true
         uses: tddschn/install-easygraph/dummy@master
+        env:
+          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           install-pytorch: 'true'
           install-lxml: 'true'
 
       - name: Install tools for debugging on failure
         if: ${{ failure() }}
+        continue-on-error: true
         shell: bash
+        env:
+          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          sudo apt install ranger ipython3
+          brew install ranger ipython
+
       - name: Setup tmate session on failure
-        if: "failure() && github.event_name == 'workflow_dispatch' && inputs.debug_enabled"
+        if: ${{ failure() }}
         uses: mxschmitt/action-tmate@v3
+        continue-on-error: true
+        env: 
+          SITE_PACKAGES_PATH: '${{ steps.test.outputs.site-packages-path }}'
+          EG_EGG_DIR_PATH: '${{ steps.test.outputs.eg-egg-dir-path }}'
+          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           limit-access-to-actor: true
           

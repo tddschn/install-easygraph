@@ -4,6 +4,9 @@
 [![Test the install-easygraph Action](https://github.com/tddschn/install-easygraph/actions/workflows/test.yaml/badge.svg)](https://github.com/tddschn/install-easygraph/actions/workflows/test.yaml)
 [![Test the install-easygraph Action (macOS)](https://github.com/tddschn/install-easygraph/actions/workflows/test-macos.yaml/badge.svg)](https://github.com/tddschn/install-easygraph/actions/workflows/test-macos.yaml)
 
+[![Test the install-easygraph Action (dummy)](https://github.com/tddschn/install-easygraph/actions/workflows/test-dummy.yaml/badge.svg)](https://github.com/tddschn/install-easygraph/actions/workflows/test-dummy.yaml)
+[![Test the install-easygraph Action (macOS)(dummy)](https://github.com/tddschn/install-easygraph/actions/workflows/test-macos-dummy.yaml/badge.svg)](https://github.com/tddschn/install-easygraph/actions/workflows/test-macos-dummy.yaml)
+
 
 - [install-easygraph](#install-easygraph)
   - [What does this Action do?](#what-does-this-action-do)
