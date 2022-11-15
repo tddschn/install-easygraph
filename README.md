@@ -101,31 +101,39 @@ Remove:
 
 ### v0.4.0
 
-Add:
-- macOS support when using `pybind11` as `cpp-binding-framework`.
-- The `install-lxml` option.
+<details>
+  <summary>Click to expand</summary>
 
+  Add:
+  - macOS support when using `pybind11` as `cpp-binding-framework`.
+  - The `install-lxml` option.
+  
+  
+  
+  Tested on ubuntu-latest with the following combination of options (note that `python-version` is not an option of this action):
+  
+  ```yaml
+      matrix:
+      python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
+      cpp-binding-framework: ["pybind11"]
+      include:
+        - use-cached-build: 'true'
+  ```
+  
+  
+  Tested on ubuntu-latest with the following combination of options (note that `python-version` is not an option of this action):
+  
+  ```yaml
+      matrix:
+          python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
+          cpp-binding-framework: ["pybind11", "boost-python"]
+          use-cached-build: ["true", "false"]
+  ```
+<!-- Two important rules:
+Make sure you have an empty line after the closing </summary> tag, otherwise the markdown/code blocks won't show correctly.
+Make sure you have an empty line after the closing </details> tag if you have multiple collapsible sections. -->
+</details>
 
-
-Tested on ubuntu-latest with the following combination of options (note that `python-version` is not an option of this action):
-
-```yaml
-    matrix:
-    python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
-    cpp-binding-framework: ["pybind11"]
-    include:
-      - use-cached-build: 'true'
-```
-
-
-Tested on ubuntu-latest with the following combination of options (note that `python-version` is not an option of this action):
-
-```yaml
-    matrix:
-        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
-        cpp-binding-framework: ["pybind11", "boost-python"]
-        use-cached-build: ["true", "false"]
-```
 
 ### v0.3.1
 
