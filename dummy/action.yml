@@ -22,6 +22,10 @@ inputs:
     description: 'Install lxml, an optional dependency for easygraph (installation would takes longer)'
     required: false
     default: 'false'
+  extra-modules-to-install:
+    description: 'Extra modules to install, e.g., "numpy pandas matplotlib statsmodels"'
+    required: false
+    default: ''
   python-package-manager-install-command:
     default: 'python -m pip install'
     # 'conda install --yes'
@@ -96,6 +100,14 @@ runs:
         ${{ inputs.python-package-manager-install-command }} tqdm joblib six scikit-learn tensorflow
         ${{ inputs.python-package-manager-install-command }} scipy progressbar progressbar33
         ${{ inputs.python-package-manager-install-command }} nose
+        echo '::endgroup::'
+
+    - name: 'install extra modules (${{ inputs.extra-modules-to-install }})'
+      if: "inputs.extra-modules-to-install != '' && inputs.use-cached-build != 'true' || steps.cache.outputs.cache-hit != 'true'"
+      shell: bash
+      run: |          
+        echo '::group::Installing extra modules'
+        ${{ inputs.python-package-manager-install-command }} ${{ inputs.extra-modules-to-install }}
         echo '::endgroup::'
 
     - name: "prepping for building easygraph's cpp binding (pybind11)"
