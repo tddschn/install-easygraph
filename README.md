@@ -114,7 +114,7 @@ Remove:
   
   ```yaml
       matrix:
-      python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
+      python-version: ["3.7", "3.8", "3.9", "3.10"]
       cpp-binding-framework: ["pybind11"]
       include:
         - use-cached-build: 'true'
@@ -125,7 +125,7 @@ Remove:
   
   ```yaml
       matrix:
-          python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
+          python-version: ["3.7", "3.8", "3.9", "3.10"]
           cpp-binding-framework: ["pybind11", "boost-python"]
           use-cached-build: ["true", "false"]
   ```
@@ -160,7 +160,7 @@ Make sure you have an empty line after the closing </details> tag if you have mu
   
   ```yaml
         matrix:
-          python-version: ["3.6", "3.7", "3.8", "3.9"]
+          python-version: ["3.7", "3.8", "3.9"]
           cpp-binding-framework: ["pybind11", "boost-python"]
           use-cached-build: ["true", "false"]
   ```
@@ -194,7 +194,7 @@ Make sure you have an empty line after the closing </details> tag if you have mu
 
   The v0.1.1 release has been tested and proved to work on these configurations on ubuntu-latest:
   ```
-          python-version: ["3.6", "3.7", "3.8", "3.9"]
+          python-version: ["3.7", "3.8", "3.9"]
           cpp-binding-framework: ["pybind11", "boost-python"]
   ```
   The release was designed to work with [easygraph](https://github.com/easy-graph/Easy-Graph) before the `pybind11` branch is merged into master (which hasn't happened when this release was created).
