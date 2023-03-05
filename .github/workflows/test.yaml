@@ -1,6 +1,8 @@
 name: Test the install-easygraph Action (Ubuntu)
 on: 
-  push:
+  # deprecated
+  # just use the dummy one
+  # push:
   workflow_dispatch:
     inputs:
       debug_enabled:

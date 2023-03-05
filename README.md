@@ -14,6 +14,7 @@
     - [`tddschn/install-easygraph`](#tddschninstall-easygraph)
     - [`tddschn/install-easygraph/dummy`](#tddschninstall-easygraphdummy)
   - [Releases and changelog](#releases-and-changelog)
+    - [v0.6.0](#v060)
     - [v0.5.0](#v050)
     - [v0.4.0](#v040)
     - [v0.3.1](#v031)
@@ -74,9 +75,18 @@ See [`dummy/action.yml`](./dummy/action.yml)
           ref: 'pybind11' # SHA1, tag, or branch
           install-lxml: 'false' # defaults to false. lxml is an optional dependency that doesn't provide wheel for macOS, installing it on macOS takes several minutes.
           install-pytorch: 'false' # whether to install pytorch
+          install-extra-modules: 'pypi-module-1 pypi-module-2'
 ```
 
 ## Releases and changelog
+
+### v0.6.0
+
+Deprecates:
+- `tddschn/install-easygraph`, please use `tddschn/install-easygraph/dummy` instead.
+
+Add:
+- The `extra-modules-to-install` option.
 
 ### v0.5.0
 

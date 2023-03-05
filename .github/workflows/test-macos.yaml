@@ -1,6 +1,6 @@
 name: Test the install-easygraph Action (macOS)
 on: 
-  push:
+  # push:
   workflow_dispatch:
     inputs:
       debug_enabled:
