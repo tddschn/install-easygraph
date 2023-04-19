@@ -143,10 +143,12 @@ runs:
         BOOST_VERSION: ${{ inputs.boost-version }}
         CC: '/usr/local/Cellar/gcc/12.2.0/bin/gcc-12'
         CXX: '/usr/local/Cellar/gcc/12.2.0/bin/g++-12'
+        PYBIND11_EXT_INCLUDE_DIRS: '/usr/local/Cellar/gcc/12.2.0/include/c++/12:/usr/local/Cellar/gcc/12.2.0/include/c++/12/x86_64-apple-darwin21'
+        PYBIND11_EXT_LIBRARIES: 'stdc++'
       working-directory: '${{ steps.tempdir.outputs.tmp-dir }}'
       run: |          
         echo '::group::Installing easygraph'
-        python setup.py install
+        python setup.py install --skip-build
         echo '::endgroup::'
 
     - name: Test easygraph installation
